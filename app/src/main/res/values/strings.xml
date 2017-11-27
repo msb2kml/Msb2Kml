@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Msb2Kml</string>
+    <string name="MSBlog">/sdcard/MSBlog</string>
+    <string name="PrefName">msb2kml</string>
+    <string name="StampFmt">yyyy-MM-dd HH:mm:ss</string>
+    <string name="vMeta">META File</string>
+    <string name="vHtml">HTML Browser</string>
+    <string name="vGraph">CSV Grapher</string>
+    <string name="vChart">CSV Charts</string>
+    <string name="vTrack">Track Browser</string>
+    <string name="vOsmAnd">OsmAnd Application</string>
+    <string name="vEarth">Google Earth</string>
+</resources>

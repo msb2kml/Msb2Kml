@@ -7,11 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -29,11 +29,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.lang.CharSequence;
 
 
-import static android.app.PendingIntent.getActivity;
 
 public class Process extends AppCompatActivity {
 
@@ -50,6 +50,8 @@ public class Process extends AppCompatActivity {
     String logPath;
     Context context;
     metaData m=new metaData();
+    MyHandler mHandler;
+    ProgressDialog prog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,17 +145,16 @@ public class Process extends AppCompatActivity {
         Comment=m.getComment();
         AlertDialog.Builder builder=new AlertDialog.Builder(this,
                 android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
-        LayoutInflater inflater=this.getLayoutInflater();
         builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 finish();
             }
         });
-        View diagview=inflater.inflate(R.layout.meta,null);
-        final EditText pl=(EditText) diagview.findViewById(R.id.plane);
+        View diagview=View.inflate(this,R.layout.meta,null);
+        final EditText pl=diagview.findViewById(R.id.plane);
         pl.setText(Plane);
-        final EditText co=(EditText) diagview.findViewById(R.id.comment);
+        final EditText co=diagview.findViewById(R.id.comment);
         co.setText(Comment);
         builder.setView(diagview)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -204,13 +205,11 @@ public class Process extends AppCompatActivity {
         Grapher=m.getGrapher();
         final CharSequence ParmList[]={"Decimated processing (1/s) ?", "Use sensors names ?",
                      "Colored Track ?", "Html table ?"};
-//                , "Adapt for CSV Grapher ?"};
         final boolean setOptions[]=new boolean[5];
         setOptions[0]=Decimated;
         setOptions[1]=NamedSensors;
         setOptions[2]=Colored;
         setOptions[3]=Html;
-//        setOptions[4]=Grapher;
         final DialogInterface.OnMultiChoiceClickListener onclick=new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -240,79 +239,92 @@ public class Process extends AppCompatActivity {
                         NamedSensors=setOptions[1];
                         Colored=setOptions[2];
                         Html=setOptions[3];
-//                        Grapher=setOptions[4];
                         Grapher=true;
                         paramAddr();
                     }
                 });
         builder.show();
     }
-    ProgressDialog prog;
 
-    final Handler mHandler = new Handler() {
-        public void handleMessage(Message msg) {
+
+    private static class MyHandler extends Handler {
+
+        public final WeakReference<Process> mActivity;
+
+        public MyHandler(Process activity){
+            mActivity=new WeakReference<Process>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg){
             int code=msg.what;
             int value;
-            switch (code){
+            switch (code) {
                 case 0: {
-                    value=(int)msg.arg1;
-                    prog.setMax(value);
+                    value = msg.arg1;
+                    mActivity.get().prog.setMax(value);
                     break;
                 }
                 case 1: {
-                    value=(int)msg.arg1;
-                    prog.setProgress(value);
+                    value = msg.arg1;
+                    mActivity.get().prog.setProgress(value);
                     break;
                 }
                 case 2: {
-                    prog.dismiss();
-                    m.putPref(context);
-                    value=(int)msg.arg1;
-                    if (value<=0){
-                        Toast toast=Toast.makeText(context,"No data!",Toast.LENGTH_LONG);
+                    mActivity.get().prog.dismiss();
+                    mActivity.get().m.putPref(mActivity.get().context);
+                    value = msg.arg1;
+                    if (value <= 0) {
+                        Toast toast = Toast.makeText(mActivity.get().context,
+                                                "No data!", Toast.LENGTH_LONG);
                         toast.show();
                     }
-                    value=(int)msg.arg2;
-                    if (value<=0){
-                        Toast toast=Toast.makeText(context,"No GPS data.",Toast.LENGTH_LONG);
+                    value = msg.arg2;
+                    if (value <= 0) {
+                        Toast toast = Toast.makeText(mActivity.get().context,
+                                          "No GPS data.", Toast.LENGTH_LONG);
                         toast.show();
                     }
-                    Intent display=new Intent(context,Display.class);
-                    display.putExtra("MsbName",MsbName);
-                    startActivity(display);
-                    finish();
+                    Intent display = new Intent(mActivity.get().context, Display.class);
+                    display.putExtra("MsbName", mActivity.get().MsbName);
+                    mActivity.get().startActivity(display);
+                    mActivity.get().finish();
                     break;
                 }
                 case 5: {
-                    prog.setMessage("Reading... (processing trigonometric functions)");
+                    mActivity.get().prog.setMessage(
+                            "Reading... (processing trigonometric functions)");
                     break;
                 }
                 case 20: {
-                    prog.dismiss();
-                    value=(int)msg.arg1;
-                    Toast toast=Toast.makeText(context, String.format("Wrong format at line  %d",value),
+                    mActivity.get().prog.dismiss();
+                    value = msg.arg1;
+                    Toast toast = Toast.makeText(mActivity.get().context,
+                              String.format("Wrong format at line  %d", value),
                             Toast.LENGTH_LONG);
                     toast.show();
-                    finish();
+                    mActivity.get().finish();
                     break;
                 }
                 case 21: {
-                    value=(int)msg.arg1;
-                    Toast toast=Toast.makeText(context, String.format("Extra Setup at line %d",value),
+                    value = msg.arg1;
+                    Toast toast = Toast.makeText(mActivity.get().context,
+                                 String.format("Extra Setup at line %d", value),
                             Toast.LENGTH_LONG);
                     toast.show();
                     break;
                 }
                 default: {
-                    String message=(String)msg.obj;
-                    Toast toast=Toast.makeText(context,message,Toast.LENGTH_LONG);
+                    String message = (String) msg.obj;
+                    Toast toast = Toast.makeText(mActivity.get().context, message,
+                                                                   Toast.LENGTH_LONG);
                     toast.show();
-                    prog.dismiss();
-                    finish();
+                    mActivity.get().prog.dismiss();
+                    mActivity.get().finish();
                 }
             }
         }
-    };
+    }
 
     void paramAddr(){
         File addr=new File(m.getPathAddr());
@@ -368,11 +380,14 @@ public class Process extends AppCompatActivity {
         prog.setMessage("Reading...");
         prog.setMax(100);
         prog.show();
+        mHandler=new MyHandler(Process.this);
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Looper.prepare();
                 fileProcess p=new fileProcess();
                 p.process(mHandler,logPath,m);
+                Looper.loop();
             }
         }).start();
 

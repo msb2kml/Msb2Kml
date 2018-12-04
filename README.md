@@ -25,7 +25,7 @@ to read and write files. You could have to check in the settings
 of the device that the installation of applications from other
 sources than Google Play is permitted.
 
-It should work on Android versions from Jelly Bean (4.1) to Nougat (7.0).
+It should work on Android versions from Jelly Bean (4.1) to Oreo (8.0).
 
 # Installation
 The application could be compiled with AndroidStudio from the files

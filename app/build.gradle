@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.js.msb2kml"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionName '4.2 Chart / Jelly Bean / Bugs correction'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionCode 42

@@ -15,8 +15,10 @@ The program remembers in its preferences the last used directory.
 
 ### Output directory
 All the files produced by the application are placed in
-the directory /sdcard/MSBlog. It is created if
-not already existing.
+the directory MSBlog. It is created if
+not already existing. This directory is located
+in the directory /storage/sdcard/ of /storage/emulated/0/,
+function of the Andoid version.
 This directory could contain a file "AddrSens.txt"
 used to customize the headings and to provide formulas
 for advanced usage. If this file does not exist,
@@ -55,7 +57,7 @@ It works with a succession of menus with the possibility to get
 back to the upper level.
 
 ### Browsing processed logs
-The application look in the directory /sdcard/MSBlog for all files with
+The application look in the directory MSBlog for all files with
 a name of the form "MSB_XXXX.txt" (meta files). 
 For each file are displayed: the date of the flight, the name of 
 the plane and the comment.

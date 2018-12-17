@@ -42,7 +42,8 @@ public class Chart extends AppCompatActivity {
 
     Context context;
     String MsbName=null;
-    metaData m=new metaData();
+    String pathMSBlog;
+    metaData m;
     listing l=new listing();
     String pathCsv=null;
     Map headings=new HashMap();
@@ -54,7 +55,7 @@ public class Chart extends AppCompatActivity {
     SharedPreferences pref=null;
     String fieldsHead[]=null;
     int colors[]={Color.BLACK,Color.BLUE,Color.CYAN,Color.MAGENTA,
-                                  Color.GREEN,Color.YELLOW,Color.RED};
+                                  Color.GREEN,0XFFC05800,Color.RED};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +64,10 @@ public class Chart extends AppCompatActivity {
         context = getApplicationContext();
         Intent intent = getIntent();
         MsbName = intent.getStringExtra("MsbName");
+        pathMSBlog=intent.getStringExtra("MSBlog");
+        m=new metaData(pathMSBlog);
         if (MsbName == null) finish();
-        l.set(context);
+        l.set(context,pathMSBlog);
         l.unique(MsbName);
         m.fetchPref(context);
         m.extract(context, MsbName);

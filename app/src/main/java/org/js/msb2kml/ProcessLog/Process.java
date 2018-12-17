@@ -49,7 +49,8 @@ public class Process extends AppCompatActivity {
     String MsbName;
     String logPath;
     Context context;
-    metaData m=new metaData();
+    String pathMSBlog;
+    metaData m;
     MyHandler mHandler;
     ProgressDialog prog;
 
@@ -58,10 +59,12 @@ public class Process extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_process);
         context = getApplicationContext();
-        m.fetchPref(context);
-        Directory = m.getDirectory();
         Intent intent = getIntent();
         logPath = intent.getStringExtra("logPath");
+        pathMSBlog=intent.getStringExtra("MSBlog");
+        m=new metaData(pathMSBlog);
+        m.fetchPref(context);
+        Directory = m.getDirectory();
         if (logPath != null) checkFile();
         Intent select=new Intent(this,Selector.class);
         select.putExtra("CurrentDir",Directory);
@@ -287,6 +290,7 @@ public class Process extends AppCompatActivity {
                     }
                     Intent display = new Intent(mActivity.get().context, Display.class);
                     display.putExtra("MsbName", mActivity.get().MsbName);
+                    display.putExtra("MSBlog",mActivity.get().pathMSBlog);
                     mActivity.get().startActivity(display);
                     mActivity.get().finish();
                     break;

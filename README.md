@@ -4,7 +4,7 @@ by the Multiplex [Flight Recorder](https://www.multiplex-rc.de/produkte/85420-fl
 This module records on a micro SD card the data circulating
 on the MSB telemetry bus.
 
-This is recorded in CSV files (comma separated values), one line
+The data is recorded in CSV files (comma separated values), one line
 by sampling time, sensor values in columns separated by semi-colons (;).
 Such a file could be used with a spreadsheet program.
 But if a GPS sensor is placed on the MSB bus, the position data is
@@ -34,7 +34,7 @@ downloaded from this repository.
 Alternatively it could be obtained with the documentation from
 the "Releases" pages from the repository.
 
-In each case the application package (such as Msb2Kml42.apk) should be
+In each case the application package (such as Msb2Kml43.apk) should be
 transferred to the storage of the device (such as /sdcard/Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.
@@ -52,4 +52,14 @@ from Google Play or [OsmAnd](https://f-droid.org/repository/browse/?fdfilter=osm
 To look at GPS track in KML files: [Google Earth](https://play.google.com/store/apps/details?id=com.google.earth).
 
 To edit the configuration file: [DroidEdit](https://play.google.com/store/apps/details?id=com.aor.droidedit) from Google Play.
+
+# Screenshots
+
+Vario, smoothed vario and height:
+
+![MSB_069](Documents/Gallery/MSB_0069_0_4_10_3.jpg)
+
+Slopesoaring:
+
+![Google Earth](Documents/Gallery/Screenshot_2017-11-22-15-49-49.jpg)
 

@@ -2,6 +2,7 @@ package org.js.msb2kml.FileSelect;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ public class Selector extends AppCompatActivity {
     navDir nav=new navDir();
     String theList[];
     int theSelected=-1;
+    String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +23,7 @@ public class Selector extends AppCompatActivity {
         setContentView(R.layout.activity_selector);
         Intent intent=getIntent();
         String currentDir=intent.getStringExtra("CurrentDir");
-        if (currentDir==null) currentDir="/";
+        if (currentDir==null) currentDir=exPath;
         nav.setCurDir(currentDir);
         String Mask=intent.getStringExtra("Mask");
         nav.setMask(Mask);

@@ -33,6 +33,15 @@
         <activity android:name=".ProcessLog.Process" />
         <activity android:name=".FileSelect.Selector" />
         <activity android:name=".DisplayLog.Chart"></activity>
+        <provider
+            android:authorities="org.js.msb2kml.provider"
+            android:name="android.support.v4.content.FileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+               android:name="android.support.FILE_PROVIDER_PATHS"
+               android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

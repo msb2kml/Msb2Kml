@@ -2,6 +2,7 @@ package org.js.msb2kml.Common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import org.js.msb2kml.R;
 
@@ -51,6 +52,13 @@ public class metaData {
     String pathAddr;
     String pathTXT;
 
+    String pathMSBlog;
+    String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+
+    public metaData(String path){
+        pathMSBlog=path;
+    }
+
     public void fetchPref(Context context){
         SharedPreferences pref=context.getSharedPreferences(
                 context.getString(R.string.PrefName),0);
@@ -65,7 +73,7 @@ public class metaData {
         } catch (ParseException e) {
             startTime=Calendar.getInstance();
         }
-        Directory=pref.getString("Directory","/mnt");
+        Directory=pref.getString("Directory",exPath);
         String value=pref.getString("Decimated","True");
         Decimated=value.equalsIgnoreCase("true");
         value=pref.getString("SensorName","True");
@@ -126,15 +134,15 @@ public class metaData {
 
     public boolean setName (Context context, String name){
         MsbName=name;
-        pathAddr=context.getString(R.string.MSBlog)+"/AddrSens.txt";
-        File f_gpx=new File(context.getString(R.string.MSBlog)+"/"+MsbName+".gpx");
+        pathAddr=pathMSBlog+"/AddrSens.txt";
+        File f_gpx=new File(pathMSBlog+"/"+MsbName+".gpx");
         if (f_gpx.exists()) return true;
-        File f_kml=new File(context.getString(R.string.MSBlog)+"/"+MsbName+".kml");
+        File f_kml=new File(pathMSBlog+"/"+MsbName+".kml");
         return f_kml.exists();
     }
 
     public boolean extract (Context context, String name){
-        pathTXT=context.getString(R.string.MSBlog)+"/"+name+".txt";
+        pathTXT=pathMSBlog+"/"+name+".txt";
         try {
             BufferedReader f=new BufferedReader(new FileReader(pathTXT));
             for (int i = 0; i < 3; i++) {
@@ -185,7 +193,7 @@ public class metaData {
         date=sdf.format(startTime.getTime());
         Directory=directory;
         Decimated=decimated;
-        pathCsv=context.getString(R.string.MSBlog)+"/"+MsbName;
+        pathCsv=pathMSBlog+"/"+MsbName;
         if (Decimated) pathCsv+="d";
         else pathCsv+="f";
         pathCsv+=".csv";
@@ -193,9 +201,9 @@ public class metaData {
         Colored=colored;
         Html=html;
         Grapher=grapher;
-        pathHtml=context.getString(R.string.MSBlog)+"/"+MsbName+".html";
-        pathGpx=context.getString(R.string.MSBlog)+"/"+MsbName+".gpx";
-        pathKml=context.getString(R.string.MSBlog)+"/"+MsbName+".kml";
+        pathHtml=pathMSBlog+"/"+MsbName+".html";
+        pathGpx=pathMSBlog+"/"+MsbName+".gpx";
+        pathKml=pathMSBlog+"/"+MsbName+".kml";
         return;
     }
 

@@ -24,15 +24,17 @@ public class listing {
     private ArrayList <String> Liste =new ArrayList<String>();
     private ArrayList <String> FileListe=new ArrayList<String>();
     private Context context;
+    private String pathMSBlog;
 
-    public boolean set(Context cont){
+    public boolean set(Context cont, String path){
         context=cont;
-        File dir=new File(context.getString(R.string.MSBlog));
+        pathMSBlog=path;
+        File dir=new File(pathMSBlog);
         return (dir.exists());
     }
 
     public void createDir() {
-        File dir=new File(context.getString(R.string.MSBlog));
+        File dir=new File(pathMSBlog);
         dir.mkdirs();
     }
 
@@ -46,13 +48,13 @@ public class listing {
     public String[] get(){
         Liste.clear();
         FileListe.clear();
-        File f1=new File(context.getString(R.string.MSBlog));
+        File f1=new File(pathMSBlog);
         FilenameFilter meta=new filterMeta("MSB_\\d{4}+\\.txt");
         if (f1.isDirectory()) {
             String s[] = f1.list(meta);
             if (s.length>0) {
                 Arrays.sort(s);
-                metaData m=new metaData();
+                metaData m=new metaData(pathMSBlog);
                 for (int i = 0; i < s.length; i++) {
                     String sName=s[i].replace(".txt","");
                     if (!m.extract(context,sName)) continue;
@@ -67,7 +69,7 @@ public class listing {
     }
 
     public void showIt(int i){
-        String path=context.getString(R.string.MSBlog)+"/"+FileListe.get(i);
+        String path=pathMSBlog+"/"+FileListe.get(i);
         Toast toast=Toast.makeText(context,path,Toast.LENGTH_LONG);
         toast.show();
     }
@@ -78,7 +80,7 @@ public class listing {
     }
 
     public String getTxt(int i){
-        String path=context.getString(R.string.MSBlog)+"/"+FileListe.get(i);
+        String path=pathMSBlog+"/"+FileListe.get(i);
         return path;
     }
 
@@ -86,12 +88,12 @@ public class listing {
         long modF=0l;
         long modD=0l;
         String name=FileListe.get(i).replace(".txt","f.csv");
-        String pathf=context.getString(R.string.MSBlog)+"/"+name;
+        String pathf=pathMSBlog+"/"+name;
         File csvf=new File(pathf);
         if (csvf.exists()) modF=csvf.lastModified();
         else pathf=null;
         name=FileListe.get(i).replace(".txt","d.csv");
-        String pathd=context.getString(R.string.MSBlog)+"/"+name;
+        String pathd=pathMSBlog+"/"+name;
         File csvd=new File(pathd);
         if (csvd.exists()) {
             modD=csvd.lastModified();
@@ -102,7 +104,7 @@ public class listing {
 
     public String getHtml(int i) {
         String name=FileListe.get(i).replace(".txt",".html");
-        String path=context.getString(R.string.MSBlog)+"/"+name;
+        String path=pathMSBlog+"/"+name;
         File html=new File(path);
         if (html.exists()) { return path; }
         return null;
@@ -110,7 +112,7 @@ public class listing {
 
     public String getGpx(int i) {
         String name=FileListe.get(i).replace(".txt",".gpx");
-        String path=context.getString(R.string.MSBlog)+"/"+name;
+        String path=pathMSBlog+"/"+name;
         File gpx=new File(path);
         if (gpx.exists()) { return path; }
         return null;
@@ -118,7 +120,7 @@ public class listing {
 
     public String getKml(int i) {
         String name=FileListe.get(i).replace(".txt",".kml");
-        String path=context.getString(R.string.MSBlog)+"/"+name;
+        String path=pathMSBlog+"/"+name;
         File kml=new File(path);
         if (kml.exists()) { return path; }
         return null;

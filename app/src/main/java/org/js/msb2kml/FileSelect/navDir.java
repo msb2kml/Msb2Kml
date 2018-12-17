@@ -1,5 +1,7 @@
 package org.js.msb2kml.FileSelect;
 
+import android.os.Environment;
+
 import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
@@ -13,7 +15,8 @@ import java.util.regex.PatternSyntaxException;
 
 public class navDir {
 
-    private String curDir="/";
+    String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+    private String curDir=exPath;
     private Pattern patrn=null;
     private Boolean noDir=true;
 
@@ -62,13 +65,13 @@ public class navDir {
 
     public String[] get(){
         File dir=new File(curDir);
-        if (!dir.exists() || !dir.isDirectory()) {
-            curDir="/";
+        if (curDir.equals("/") || !dir.exists() || !dir.isDirectory()) {
+            curDir=exPath;
             dir=new File(curDir);
         }
         ArrayList <String> directories=new ArrayList<String>();
         ArrayList <String> files=new ArrayList<String>();
-        directories.add("../");
+        directories.add("../   (up)");
         String s[]=dir.list();
         if (s!=null && s.length>0){
             Arrays.sort(s);

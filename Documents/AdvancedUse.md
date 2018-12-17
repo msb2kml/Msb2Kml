@@ -56,6 +56,8 @@ Each function is presented as it could be used on a line of the file.
 Hint: if there is a too high spike when the current is cut off,
 specify a higher threshold.
 
+See: [chart](Gallery/MSB_0095_17_4_12.jpg)
+
 ###### Colorization of track in KML file.
 
     =COL,-0.35,0.35,$B;-;   %
@@ -63,6 +65,8 @@ specify a higher threshold.
 Colorized here by the smoothed vario.
 + $B is the smoothed vario (see =SMTH). The range -0.35 to 0.35 m/s
 for the vario is converted to the range 0 to 100 for the color ($%). 
+
+See: [Screenshot](Gallery/Screenshot_2017-11-22-15-49-49.jpg)
 
 ###### Summation of all sinking of the flight
 
@@ -109,6 +113,8 @@ airspeed in still air. These conditions could rarely be maintained
 for long in a typical flight of our models. You have to apply
 some judgment about this parameter.
 
+See: [Chart](Gallery/MSB_0083_12_3_15.jpg)
+
 ###### Voltage with no load
 
     =HVL,1,$i,$v,$V;-;      V
@@ -138,6 +144,8 @@ to memorize (here the time).
 If the current is above the threshold (here 1 A) the difference
 of time is added to the time scale; otherwise it is not modified.
 
+See: [Chart](Gallery/MSB_0095_17_4_12.jpg)
+
 ###### Energy (as limited for F5B and F5D)
 
     =NRJ,$w,$s,$j;W.min;   j
@@ -147,6 +155,8 @@ of time is added to the time scale; otherwise it is not modified.
 
 The product of the power by the delta time is added to the energy.
 The appropriate factor is applied for a reading in Watt\*minute.
+
+See: [Chart](Gallery/MSB_0095_0_4_11.jpg)
 
 ###### Product (here power) of 2 values
 
@@ -164,6 +174,8 @@ The appropriate factor is applied for a reading in Watt\*minute.
 
 The current value is added with some weight (here 0.1) to the
 memorized value multiplied by the complementary weight (here 0.9). 
+
+See: [Chart](Gallery/MSB_0069_0_4_10_3.jpg)
 
 ###### Time scale covering only the flight without motor
 
@@ -184,6 +196,8 @@ distance from the successive positions recorded by the GPS.
 + $K is the speed from the GPS sensor: it is not used in the
 computation but its inclusion assures than this function
 is not invoked if the GPS is not present. 
+
+See: [Chart](Gallery/MSB_0095_17_4_12.jpg)
 
 ### Note
 

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,15 +19,19 @@ import org.js.msb2kml.DisplayLog.Chart;
 import org.js.msb2kml.R;
 import org.js.msb2kml.Common.listing;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.security.AccessController.getContext;
 
 public class Display extends AppCompatActivity {
 
     Context context;
-    metaData m=new metaData();
+    metaData m;
     listing l=new listing();
     String MsbName=null;
+    String pathMSBlog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +40,9 @@ public class Display extends AppCompatActivity {
         context=getApplicationContext();
         Intent intent=getIntent();
         MsbName=intent.getStringExtra("MsbName");
-        l.set(context);
+        pathMSBlog=intent.getStringExtra("MSBlog");
+        m=new metaData(pathMSBlog);
+        l.set(context,pathMSBlog);
         if (MsbName==null) diag();
         else {
             l.unique(MsbName);
@@ -96,7 +104,6 @@ public class Display extends AppCompatActivity {
         if (pathCsv!=null) {
             vMenu.add(this.getString(R.string.vChart));
         }
-//            vMenu.add(this.getString(R.string.vGraph)); }
         String pathGpx=l.getGpx(selFile);
         if (pathGpx!=null) {
             vMenu.add(this.getString(R.string.vTrack));
@@ -133,7 +140,6 @@ public class Display extends AppCompatActivity {
     }
 
     boolean Earth=false;
-//    boolean CsvGrapher=false;
     boolean OsmAnd=false;
     boolean TrackBrowser=false;
 
@@ -143,7 +149,6 @@ public class Display extends AppCompatActivity {
         for (PackageInfo AI : allPack) {
             String zz=AI.packageName;
             if (zz.contains("earth")) Earth=true;
-//            if (zz.contains("csvgrapher")) CsvGrapher=true;
             if (zz.contains("osmand")) OsmAnd=true;
             if (zz.contains("TrackBrowser")) TrackBrowser=true;
         }
@@ -155,25 +160,10 @@ public class Display extends AppCompatActivity {
             Intent nt=new Intent(this,Browse.class);
             nt.putExtra("url","file://"+l.getHtml(selFile));
             startActivity(nt);
-/*        } else if (vMenu.get(which).contentEquals(this.getString(R.string.vGraph))) {
-            if (CsvGrapher) {
-                Uri u= Uri.parse("file://"+l.getCsv(selFile));
-                Intent nt=new Intent("com.valeonom.csvgrapher.MainActivity");
-                nt.setClassName("com.valeonom.csvgrapher","com.valeonom.csvgrapher.MainActivity");
-                nt.setData(u);
-                nt.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-                nt.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-                startActivity(nt);
-            } else {
-                Toast toast=Toast.makeText(this,"CSV Grapher not installed",Toast.LENGTH_LONG);
-                toast.show();
-            }
-*/
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vChart))) {
             Intent nt=new Intent(this,Chart.class);
             nt.putExtra("MsbName",l.getBase(selFile));
+            nt.putExtra("MSBlog",pathMSBlog);
             startActivity(nt);
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vTrack))) {
             if (TrackBrowser) {
@@ -192,9 +182,16 @@ public class Display extends AppCompatActivity {
             }
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vOsmAnd))) {
             if (OsmAnd) {
-                Uri u=Uri.parse("file://"+l.getGpx(selFile));
+                File f=new File(l.getGpx(selFile));
+                Uri u;
+//                if (Build.VERSION.SDK_INT < 24) {
+                    u=Uri.fromFile(f);
+//                } else {
+//                    u=FileProvider.getUriForFile(context,"org.js.msb2kml.provider", f);
+//                }
                 Intent nt= new Intent(Intent.ACTION_VIEW);
-                nt.setClassName("net.osmand.plus","net.osmand.plus.activities.MapActivity");
+                nt.setClassName("net.osmand.plus",
+                        "net.osmand.plus.activities.MapActivity");
                 nt.setData(u);
                 nt.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
                 nt.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
@@ -207,14 +204,20 @@ public class Display extends AppCompatActivity {
             }
         }else {
             if (Earth) {
-                Uri u=Uri.parse("file://"+l.getKml(selFile));
+                File f=new File(l.getKml(selFile));
+                Uri u;
+//                if (Build.VERSION.SDK_INT < 24) {
+//                    u=Uri.fromFile(f);
+//                } else {
+                    u = FileProvider.getUriForFile(context, "org.js.msb2kml.provider", f);
+//                }
                 Intent nt=new Intent(Intent.ACTION_VIEW);
-                nt.setType("application/vnd.google-earth.kml+xml");
+                nt.setDataAndType(u, "application/vnd.google-earth.kml+xml");
                 nt.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
                 nt.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
                 nt.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
                 nt.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-                nt.setData(u);
+                nt.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 nt.setPackage("com.google.earth");
                 startActivity(nt);
             } else {

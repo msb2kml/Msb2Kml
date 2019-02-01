@@ -1,5 +1,7 @@
 package org.js.msb2kml.Work;
 
+import android.location.Location;
+
 import java.util.ArrayList;
 
 /**
@@ -746,6 +748,58 @@ class BIR extends tool {
     }
 }
 
+class GPS extends tool{
+
+    public float compute(){
+        Float azimuth=((ArrayList<Float>)args[0].thing).get(args[0].index);
+        Float distance=((ArrayList<Float>)args[1].thing).get(args[1].index);
+        Float altitude=((ArrayList<Float>)args[2].thing).get(args[2].index);
+        Location loc=fp.haver.invHaver(fp.startLoc,distance,azimuth,altitude);
+        Exception e=fp.addPoint(loc);
+        if (e==null) return 1.0f;
+        else return 0.0f;
+    }
+
+    public boolean check(fileProcess f, String fields[], Character l){
+        if (l!=null) label=l;
+        fp=f;
+        if (fields.length<4 || fp.startLoc==null){
+            if (label!=null) fp.delVar(label);
+            fp.startLoc=null;
+            return false;
+        }
+        letter=new char[3];
+        args=new fileProcess.Var[3];
+        for (int i=1;i<4;i++){
+            if (fields[i].length()<2 || !fields[i].startsWith("$")){
+               if (label!=null) fp.delVar(label);
+               fp.startLoc=null;
+               return false;
+            }
+            letter[i-1]=fields[i].charAt(1);
+            args[i-1]=fp.getVar(letter[i-1]);
+            if (args[i-1]==null){
+                if (label!=null) fp.delVar(label);
+                fp.startLoc=null;
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkMore(){
+        fileProcess.Var Azim=fp.getVar(letter[0]);
+        fileProcess.Var Dist=fp.getVar(letter[1]);
+        fileProcess.Var Alti=fp.getVar(letter[2]);
+        if (fp.startLoc==null || Azim==null || Dist==null || Alti==null){
+            if (label!=null) fp.delVar(label);
+            fp.startLoc=null;
+            return false;
+        }
+        return true;
+    }
+}
+
 class tb{
 
     public tool toolBox(fileProcess f, String expr, Character l){
@@ -803,9 +857,13 @@ class tb{
             tool t = new TRV();
             if (t.check(f, fields, l)) return t;
             return null;
-          } else if (fields[0].matches("=COL")) {
+        } else if (fields[0].matches("=COL")) {
             tool t = new COL();
             if (t.check(f, fields, l)) return t;
+            return null;
+        } else if (fields[0].matches("=GPS")){
+            tool t=new GPS();
+            if (t.check(f,fields,l)) return t;
             return null;
         } else return null;
     }

@@ -45,7 +45,7 @@ public class listing {
         return;
     }
 
-    public String[] get(){
+    public String[] get(boolean gpx){
         Liste.clear();
         FileListe.clear();
         File f1=new File(pathMSBlog);
@@ -58,6 +58,10 @@ public class listing {
                 for (int i = 0; i < s.length; i++) {
                     String sName=s[i].replace(".txt","");
                     if (!m.extract(context,sName)) continue;
+                    if (gpx){
+                        File g=new File(m.getPathGpx());
+                        if (!g.exists()) continue;
+                    }
                     String line=sName+" / "+m.getDay()+" / "+m.getPlane()+" / "+m.getComment();
                     Liste.add(line);
                     FileListe.add(s[i]);

@@ -12,6 +12,17 @@ inserted as lines with another format that is not sent by
 the return link.
 This application makes a separation between these two kinds of data.
 
+However, the Flight Recorder could be used on the ground, connected
+to the COM port of a 
+[Souffleur](https://www.multiplex-rc.de/produkte/45185-souffleur-deutsch)
+or of an HF module for a transmitter. The log files could contain the
+data transmitted through the telemetry from the GPS module, including the
+position of the plane relative to the pilot.
+The Msb2Kml application is able to reconstruct the geographic coordinates of
+the flight track from this data if the location of the pilot is provided.
+Log files produced by the sibling application Msb2And could also
+be processed this way.
+
 Running on a tablet or smartphone, it produces files that could
 be viewed and analyzed with the included software modules
 and/or with applications available on theses devices.
@@ -34,8 +45,8 @@ downloaded from this repository.
 Alternatively it could be obtained with the documentation from
 the "Releases" pages from the repository.
 
-In each case the application package (such as Msb2Kml43.apk) should be
-transferred to the storage of the device (such as /sdcard/Downloads).
+In each case the application package (such as Msb2Kml50.apk) should be
+transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.
 

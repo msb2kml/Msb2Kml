@@ -32,6 +32,8 @@ public class Display extends AppCompatActivity {
     listing l=new listing();
     String MsbName=null;
     String pathMSBlog;
+    Boolean gpx=false;
+    String[] ar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class Display extends AppCompatActivity {
         Intent intent=getIntent();
         MsbName=intent.getStringExtra("MsbName");
         pathMSBlog=intent.getStringExtra("MSBlog");
+        gpx=intent.getBooleanExtra("Gpx",false);
         m=new metaData(pathMSBlog);
         l.set(context,pathMSBlog);
         if (MsbName==null) diag();
@@ -51,16 +54,18 @@ public class Display extends AppCompatActivity {
     }
 
     void diag() {
-        String[] ar=l.get();
+        ar=l.get(gpx);
         if (ar.length >0) {
-            AlertDialog.Builder build=new AlertDialog.Builder(this,
-                        android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
-            build.setTitle("Choose a flight")
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+            AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                        android.R.style.Theme_DeviceDefault_Light_NoActionBar);
+            if (gpx) build.setTitle("Choose a flight for the GPX");
+            else build.setTitle("Choose a flight");
+            build.setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
                             Intent intent = getIntent();
-                            setResult(RESULT_OK, intent);
+                            setResult(RESULT_CANCELED,intent);
+//                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     })
@@ -68,22 +73,21 @@ public class Display extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = getIntent();
-                            setResult(RESULT_OK, intent);
+                            setResult(RESULT_CANCELED,intent);
+//                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     })
                 .setItems(ar, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            disp(which);
-                        }
+                        public void onClick(DialogInterface dialog, int which) {disp(which);}
                     });
         build.show();
         } else {
             Toast toast = Toast.makeText(this,"No file in the directory!",Toast.LENGTH_LONG);
             toast.show();
             Intent intent = getIntent();
-            setResult(RESULT_OK, intent);
+            setResult(RESULT_CANCELED, intent);
             finish();
         }
     }
@@ -93,29 +97,39 @@ public class Display extends AppCompatActivity {
 
     void disp(int which){
         selFile=which;
-        vMenu.clear();
-        String pathTxt=l.getTxt(selFile);
-        vMenu.add(this.getString(R.string.vMeta));
-        String pathHtml=l.getHtml(selFile);
-        if (pathHtml!=null) {
-            vMenu.add(this.getString(R.string.vHtml));
-        }
-        String pathCsv=l.getCsv(selFile);
-        if (pathCsv!=null) {
-            vMenu.add(this.getString(R.string.vChart));
-        }
-        String pathGpx=l.getGpx(selFile);
-        if (pathGpx!=null) {
-            vMenu.add(this.getString(R.string.vTrack));
-            vMenu.add(this.getString(R.string.vOsmAnd));
-        }
-        String pathKml=l.getKml(selFile);
-        if (pathKml!=null) {
-            vMenu.add(this.getString(R.string.vEarth)); }
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                        android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
-        build.setTitle(l.getBase(selFile))
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+        if (gpx) {
+            String pathGpx=l.getGpx(selFile);
+            Intent intent=new Intent();
+            intent.putExtra("Name",l.getBase(which));
+            intent.putExtra("MSBcom",ar[which]);
+            intent.putExtra("pathGps",pathGpx);
+            setResult(RESULT_OK,intent);
+            finish();
+        } else {
+            vMenu.clear();
+            String pathTxt = l.getTxt(selFile);
+            vMenu.add(this.getString(R.string.vMeta));
+            String pathHtml = l.getHtml(selFile);
+            if (pathHtml != null) {
+                vMenu.add(this.getString(R.string.vHtml));
+            }
+            String pathCsv = l.getCsv(selFile);
+            if (pathCsv != null) {
+                vMenu.add(this.getString(R.string.vChart));
+            }
+            String pathGpx = l.getGpx(selFile);
+            if (pathGpx != null) {
+                vMenu.add(this.getString(R.string.vTrack));
+                vMenu.add(this.getString(R.string.vOsmAnd));
+            }
+            String pathKml = l.getKml(selFile);
+            if (pathKml != null) {
+                vMenu.add(this.getString(R.string.vEarth));
+            }
+            AlertDialog.Builder build = new AlertDialog.Builder(this);
+//                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
+            build.setTitle(l.getBase(selFile))
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
                             Intent intent = getIntent();
@@ -123,20 +137,21 @@ public class Display extends AppCompatActivity {
                             finish();
                         }
                     })
-                .setItems(vMenu.toArray(new String[0]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        extDisp(which);
-                    }
-                })
-                .setNeutralButton("Back", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (MsbName!=null) finish();
-                        else diag();
-                    }
-                });
-        build.show();
+                    .setItems(vMenu.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            extDisp(which);
+                        }
+                    })
+                    .setNeutralButton("Back", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (MsbName != null) finish();
+                            else diag();
+                        }
+                    });
+            build.show();
+        }
     }
 
     boolean Earth=false;

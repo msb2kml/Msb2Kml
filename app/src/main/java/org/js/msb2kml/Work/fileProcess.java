@@ -1,5 +1,6 @@
 package org.js.msb2kml.Work;
 
+import android.location.Location;
 import android.os.Message;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -44,9 +45,29 @@ public class fileProcess {
     kmlGen k=new kmlGen();
     boolean useDist=false;
     ArrayList<Float> totDist=new ArrayList<Float>();
+    Location prevLoca=null;
+    FileWriter outCsv=null;
+    FileWriter outHtml=null;
+    FileWriter outGpx=null;
+    FileWriter outKml=null;
+    int outSec=-1;
+    int htmlMin=-1;
+    boolean red=true;
+    metaData m;
+    Map<String,String> lineColor=new HashMap<>();
+    int minute=0;
+    int kmlMinute=0;
+    Var colorVar=null;
+    String currentColor=null;
+    boolean gpsNext=true;
+    int gpsNb=0;
+    Haversine haver;
+    Location startLoc;
+    Calendar startTime;
+    Handler hand;
 
-    public void process(Handler hand, String path, metaData m){
-        Map<String,String> lineColor=new HashMap<>();
+    public void process(Handler handler, String path, metaData meta, Location loc){
+
         lineColor.put("Line00","FFFF0000");
         lineColor.put("Line01","FFDA0024");
         lineColor.put("Line02","FFB60048");
@@ -55,24 +76,17 @@ public class fileProcess {
         lineColor.put("Line05","FF4800B6");
         lineColor.put("Line06","FF2400DA");
         lineColor.put("Line07","FF0000FF");
+        m=meta;
+        hand=handler;
         boolean Decimated=m.getDecimated();
         boolean Grapher=m.getGrapher();
         boolean Html=m.getHtml();
-        Calendar startTime=m.getStartTime();
-        FileWriter outCsv=null;
-        FileWriter outHtml=null;
-        FileWriter outGpx=null;
-        FileWriter outKml=null;
-        int outSec=-1;
-        int htmlMin=-1;
-        boolean red=true;
-        Haversine haver=new Haversine();
-        int minute=0;
-        int kmlMinute=0;
+        startTime=m.getStartTime();
+        haver=new Haversine();
         boolean inTable=false;
         String prevAnchor="#top";
         String nextAnchor="#bottom";
-        Var colorVar=null;
+        startLoc=loc;
         if (m.getNamedSensors()) readAddr(m);
         try {
             FileInputStream input=new FileInputStream(path);
@@ -86,8 +100,6 @@ public class fileProcess {
             int prevPos=0;
             int lineNb=0;
             int dataNb=0;
-            int gpsNb=0;
-            boolean gpsNext=true;
             int firstLines=0;
             TextUtils.StringSplitter semiColon=new TextUtils.SimpleStringSplitter(';');
             TextUtils.StringSplitter comma=new TextUtils.SimpleStringSplitter(',');
@@ -106,7 +118,6 @@ public class fileProcess {
             String prevFields[]={"0","0"};
             Float prevLat=null;
             Float prevLon=null;
-            String currentColor=null;
             int nComp=0;
             int nCol=0;
 //------------------------------------------------------------ start reading
@@ -282,67 +293,23 @@ public class fileProcess {
                     }
 //--------------------------------------------------------------------------GPGGA
                 } else if (line.startsWith("$GPGGA,") && firstLines==2){
+                    if (startLoc!=null) continue;
                     if (Decimated && !gpsNext) continue;
                     String fields[]=patColo.split(line);
-                    Float lat=Float.parseFloat(fields[2])/(float)100.0;
-                    Float lon=Float.parseFloat(fields[4])/(float)100.0;
-                    if (fields[3].contains("S")) lat=-lat;
-                    if (fields[5].contains("W")) lon=-lon;
-                    String height=fields[9];
-                    if (useDist){
-                        if (prevLat!=null){
-                            Double w=haver.haversine(prevLat.doubleValue(),prevLon.doubleValue(),
-                                    lat.doubleValue(),lon.doubleValue())+totDist.get(0);
-                            totDist.set(0,w.floatValue());
-                        } else {
-                            msg=hand.obtainMessage(5,position,position);
-                            hand.sendMessage(msg);
-                        }
-                        prevLat=lat;
-                        prevLon=lon;
-                    }
-                    Calendar currentTime=Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                    currentTime.setTime(startTime.getTime());
-                    currentTime.add(Calendar.SECOND,outSec);
-                    if (outGpx == null){
-                      outGpx=new FileWriter(m.getPathGpx());
-                        g.beginGpx(outGpx,m,m.getTitle());
-                    }
-                    g.pointGpx(currentTime,lon,lat,height);
-                    if (outKml == null){
-                        outKml=new FileWriter(m.getPathKml());
-                        k.prolog(outKml,m,m.getTitle(),lat,lon,lineColor);
-                        kmlMinute=minute;
-                        if (colorVar==null){
-                            k.beginLine(red, kmlMinute);
-                            if (m.getColored()) red = !red;
-                        } else {
-                            currentColor=styleColor(colorVar,lineColor.size());
-                            k.beginLineColor(currentColor,minute);
-                        }
-                    }
-                    outKml.write(String .format(Locale.US,"%.8f,%.8f,%s\n",lon,lat,height));
-                    if (colorVar==null){
-                         if (minute>kmlMinute) {
-                            kmlMinute = minute;
-                            if (m.getColored()) {
-                               k.endLine();
-                               k.beginLine(red, kmlMinute);
-                               red = !red;
-                               outKml.write(String.format(Locale.US,"%.8f,%.8f,%s\n", lon, lat, height));
-                            }
-                         }
+                    Location loca=new Location("");
+                    if (fields[3].contains("S")){
+                        loca.setLatitude(Double.parseDouble(fields[2])/(double)-100.0);
                     } else {
-                        String newColor=styleColor(colorVar,lineColor.size());
-                        if (!currentColor.contentEquals(newColor)){
-                            k.endLine();
-                            kmlMinute=minute;
-                            k.beginLineColor(newColor,minute);
-                            outKml.write(String.format(Locale.US,"%.8f,%.8f,%s\n", lon, lat, height));
-                        }
+                        loca.setLatitude(Double.parseDouble(fields[2]) / (double) 100.0);
                     }
-                    gpsNext=false;
-                    gpsNb++;
+                    if (fields[5].contains("W")){
+                        loca.setLongitude(Double.parseDouble(fields[4])/(double)-100.0);
+                    } else {
+                        loca.setLongitude(Double.parseDouble(fields[4]) / (double) 100.0);
+                    }
+                    loca.setAltitude(Double.parseDouble(fields[9]));
+                    Exception e=addPoint(loca);
+                    if (e!=null) throw e;
 //---------------------------------------------------------------------- wrong
                 } else if (line.startsWith("$SETUP")) {
                     msg=hand.obtainMessage(21,lineNb,firstLines);
@@ -403,6 +370,79 @@ public class fileProcess {
             msg=hand.obtainMessage(666,e.getMessage());
             hand.sendMessage(msg);
         }
+    }
+
+    Exception addPoint(Location loc){
+        Calendar currentTime=(Calendar)startTime.clone();
+        currentTime.add(Calendar.SECOND,outSec);
+        loc.setTime(currentTime.getTimeInMillis());
+        Double Lat=loc.getLatitude();
+        Double Lon=loc.getLongitude();
+        Double Alt=loc.getAltitude();
+        if (prevLoca!=null && (Lat.compareTo(prevLoca.getLatitude())==0) &&
+                (Lon.compareTo(prevLoca.getLongitude())==0) &&
+                (Alt.compareTo(prevLoca.getAltitude())==0)) return null;
+        if (useDist) {
+            if (prevLoca == null){
+                prevLoca = new Location("");
+                msg=hand.obtainMessage(5,position,position);
+                hand.sendMessage(msg);
+            }
+            else {
+                Double Dist=haver.lHaversine(prevLoca,loc)+totDist.get(0);
+//                Float dist = prevLoca.distanceTo(loc) / 1000.0f;
+                totDist.set(0,Dist.floatValue());
+            }
+        }
+        if (prevLoca==null) prevLoca=new Location("");
+        prevLoca.set(loc);
+        try {
+            if (outGpx == null) {
+                outGpx = new FileWriter(m.getPathGpx());
+                g.beginGpx(outGpx,m,m.getTitle());
+            }
+            g.pointGpx(loc);
+            if (outKml==null){
+                outKml=new FileWriter(m.getPathKml());
+                k.prolog(outKml,m,m.getTitle(),loc,lineColor);
+                kmlMinute=minute;
+                if (colorVar==null){
+                    k.beginLine(red,kmlMinute);
+                    if (m.getColored()) red=!red;
+                } else {
+                    currentColor=styleColor(colorVar,lineColor.size());
+                    k.beginLineColor(currentColor,minute);
+                }
+            }
+            outKml.write(String.format(Locale.ENGLISH,"%.8f,%.8f,%.8f\n",
+                    loc.getLongitude(),loc.getLatitude(),loc.getAltitude()));
+            if (colorVar==null){
+                if (minute>kmlMinute){
+                    kmlMinute=minute;
+                    if (m.getColored()){
+                        k.endLine();
+                        k.beginLine(red,kmlMinute);
+                        red=!red;
+                        outKml.write(String.format(Locale.ENGLISH,"%.8f,%.8f,%.8f\n",
+                                  loc.getLongitude(),loc.getLatitude(),loc.getAltitude()));
+                    }
+                }
+            } else {
+                String newColor=styleColor(colorVar,lineColor.size());
+                if (!currentColor.contentEquals(newColor)){
+                    k.endLine();
+                    kmlMinute=minute;
+                    k.beginLineColor(newColor,minute);
+                    outKml.write(String.format(Locale.ENGLISH,"%.8f,%.8f,%.8f\n",
+                                  loc.getLongitude(),loc.getLatitude(),loc.getAltitude()));
+                }
+            }
+            gpsNext=false;
+            gpsNb++;
+            } catch (Exception e){
+                return e;
+            }
+        return null;
     }
 
     String styleColor(Var colorVar, int nColor){

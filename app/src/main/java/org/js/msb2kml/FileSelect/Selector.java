@@ -36,8 +36,8 @@ public class Selector extends AppCompatActivity {
         nav.setNoDir(false);
         theList=nav.get();
         theSelected=-1;
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                    android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+        AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle(nav.getDir())
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
@@ -84,8 +84,8 @@ public class Selector extends AppCompatActivity {
         nav.setNoDir(false);
         theList=nav.get();
         theSelected=-1;
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                    android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+        AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle(nav.getDir())
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override

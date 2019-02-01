@@ -18,7 +18,7 @@ All the files produced by the application are placed in
 the directory MSBlog. It is created if
 not already existing. This directory is located
 in the directory /storage/sdcard/ of /storage/emulated/0/,
-function of the Andoid version.
+function of the Android version.
 This directory could contain a file "AddrSens.txt"
 used to customize the headings and to provide formulas
 for advanced usage. If this file does not exist,
@@ -39,7 +39,7 @@ produce the files:
        links.
 * "MSB_XXXXf.csv": this is essentially a copy of the input
        file cleaned off the GPS data and transformed for further
-       processing: there is only one line of headings, the 
+       processing: there is only one line of headings, the
        decimal separator is the dot (12.34) instead of the
        comma (12,34).
 * "MSB_XXXXd.csv": this is the same as the previous file but decimated
@@ -50,8 +50,11 @@ produce the files:
        of colored segments.
 
 ### Launching the application
-It has an red and green icon with the letters "M/K".
-From the start there are 2 branches: one to browse the previously
+It has a red and green icon with the letters "M/K".
+There are two panels on the screen, the bottom one is
+concerned by the processing from a remote GPS module:
+see the file "RemoteGPS" in this directory.
+From the top panel there are 2 branches: one to browse the previously
 processed logs and one to process a new log.
 It works with a succession of menus with the possibility to get
 back to the upper level.
@@ -59,7 +62,7 @@ back to the upper level.
 ### Browsing processed logs
 The application look in the directory MSBlog for all files with
 a name of the form "MSB_XXXX.txt" (meta files). 
-For each file are displayed: the date of the flight, the name of 
+For each file are displayed: the date of the flight, the name of
 the plane and the comment.
 A choice of visualization options is presented when a file is selected.
 The meta file and the HTML file are viewed with the HtmlViewer.
@@ -71,35 +74,35 @@ cached maps/photos) and with "OsmAnd" (off-line maps).
 segmented tracks.
 Finally, the KML file could be viewed with "Google Earth". 
 The last version of GE permits to view the track in 3D.
-And, out of the application, this file could also be transferred to 
-a PC where Google Earth has more capabilities: perspective view, 
+And, out of the application, this file could also be transferred to
+a PC where Google Earth has more capabilities: perspective view,
 hiding some segments, profile...
 The track is divided in segments each of 1 minute flight time,
 alternating red and blue. There are other possibilities with
 the advanced usage.
 
 ### Processing a new log
-A specialized file manager shows only files with the appropriate 
+A specialized file manager shows only files with the appropriate
 form of name and directories. At the first ever use
-the display start at the /mnt directory; at subsequent uses it
+the display start at the /storage directory; at subsequent uses it
 starts at the last directory used. The "../" entry move up in the hierarchy.
 When a file has been selected there is a succession of choices
 for the processing. Usually the default choices are to be used.
 One has then to provide the meta information. If a corresponding
-meta file is found in /sdcard/MSBlog the information in this
+meta file is found in MSBlog the information in this
 file is used as default for the meta information.
 A progression bar is displayed while the log file is processed.
 Then the same visualization choices are presented as explained before.
 
 ### Basic use of AddrSens.txt
-This file in the directory /sdcard/MSBlog provide some customization.
+This file in the directory MSBlog provides some customization.
 All lines of this file starting with a star "\*" are comments that
 are skipped.
 Each active line is composed of 3 fields separated by a semi-colon ";"
 but the third field is optional.
 For the basic usage the first field has to be exactly as the heading of
 a column as delivered by the Flight Logger: "Time" and " A:00" to " A:16"
-(note the space). If the Logger heading match a first field it is replaced
+(note the space). If the Logger heading match a first field, it is replaced
 with the second field. But if the second field is a minus "-" the column
 is hidden from the listings (but could be used for computation).
 If the third field is present it should be a single character (any character,

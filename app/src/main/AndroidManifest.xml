@@ -3,6 +3,9 @@
     package="org.js.msb2kml">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,23 +30,36 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayLog.Browse">
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_browse"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".DisplayLog.Browse"
+            android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".ProcessLog.Process" />
-        <activity android:name=".FileSelect.Selector" />
-        <activity android:name=".DisplayLog.Chart"></activity>
+        <activity android:name=".ProcessLog.Process"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity android:name=".FileSelect.Selector"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity android:name=".DisplayLog.Chart"
+            android:windowSoftInputMode="stateHidden"/>
+
         <provider
-            android:authorities="org.js.msb2kml.provider"
             android:name="android.support.v4.content.FileProvider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:authorities="org.js.msb2kml.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
-               android:name="android.support.FILE_PROVIDER_PATHS"
-               android:resource="@xml/file_paths" />
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
+
+        <activity
+            android:name=".Common.HandFix"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Common.GetFix"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Common.CopyFix"
+            android:windowSoftInputMode="stateHidden" />
+
     </application>
 
 </manifest>

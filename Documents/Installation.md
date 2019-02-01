@@ -2,14 +2,14 @@
 The application should be compiled from the sources of this
 repository or downloaded from the "Releases" pages.
 The application package (such as Msb2KmlXX.apk) should be transferred 
-to the storage of the device (such as /sdcard/Downloads). Selecting it
+to the storage of the device (such as Downloads). Selecting it
 with a File Manager should offer the opportunity to install it.
 
 # Accessory installations
 Other applications should be installed for a better experience;
 they are all frees.
 
-To look at GPS track in GPX files: 
+To look at GPS track in GPX files:
 [GPS Track Browser and Viewer](https://play.google.com/store/apps/details?id=com.qbedded.TrackBrowser)
 from Google Play.
 

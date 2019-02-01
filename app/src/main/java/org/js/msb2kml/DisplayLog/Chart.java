@@ -156,8 +156,8 @@ public class Chart extends AppCompatActivity {
     }
 
     void selectX(){
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                    android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+        AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle("Select the column for X axis")
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
@@ -182,8 +182,8 @@ public class Chart extends AppCompatActivity {
         for (int i = 0; i < ylHead.size(); i++){
             checked[(int) headings.get(ylHead.get(i))]=true;
         }
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+        AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle("Select the column(s) sharing the left Y axis")
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
@@ -217,8 +217,8 @@ public class Chart extends AppCompatActivity {
         for (int i = 0; i < yrHead.size(); i++){
             checked[(int) headings.get(yrHead.get(i))]=true;
         }
-        AlertDialog.Builder build=new AlertDialog.Builder(this,
-                android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen);
+        AlertDialog.Builder build=new AlertDialog.Builder(this);
+//                android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle("Select the column(s) sharing the right Y axis")
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override

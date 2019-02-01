@@ -31,6 +31,7 @@ public class metaData {
     String date;
     String plane;
     String comment;
+    String startName=null;
 
     Calendar startTime;
     String Directory;
@@ -51,12 +52,15 @@ public class metaData {
     String pathKml;
     String pathAddr;
     String pathTXT;
-
+    String pathStartGPS;
     String pathMSBlog;
     String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
 
     public metaData(String path){
+
         pathMSBlog=path;
+        pathAddr=pathMSBlog+"/AddrSens.txt";
+        pathStartGPS=pathMSBlog+"/StartGPS.gpx";
     }
 
     public void fetchPref(Context context){
@@ -87,6 +91,7 @@ public class metaData {
         ChartX=pref.getString("ChartX",null);
         ChartYL=pref.getStringSet("ChartYL",null);
         ChartYR=pref.getStringSet("ChartYR",null);
+        startName=pref.getString("StartName",null);
         return;
     }
 
@@ -98,6 +103,7 @@ public class metaData {
         edit.putString("Comment",comment);
         edit.putString("StartTime",date);
         edit.putString("Directory",Directory);
+        edit.putString("StartName",startName);
         if (Decimated) edit.putString("Decimated","True");
         else edit.putString("Decimated","False");
         if (NamedSensors) edit.putString("SensorName","True");
@@ -134,7 +140,6 @@ public class metaData {
 
     public boolean setName (Context context, String name){
         MsbName=name;
-        pathAddr=pathMSBlog+"/AddrSens.txt";
         File f_gpx=new File(pathMSBlog+"/"+MsbName+".gpx");
         if (f_gpx.exists()) return true;
         File f_kml=new File(pathMSBlog+"/"+MsbName+".kml");
@@ -142,7 +147,11 @@ public class metaData {
     }
 
     public boolean extract (Context context, String name){
-        pathTXT=pathMSBlog+"/"+name+".txt";
+        MsbName=name;
+        pathTXT=pathMSBlog+"/"+MsbName+".txt";
+        pathHtml=pathMSBlog+"/"+MsbName+".html";
+        pathGpx=pathMSBlog+"/"+MsbName+".gpx";
+        pathKml=pathMSBlog+"/"+MsbName+".kml";
         try {
             BufferedReader f=new BufferedReader(new FileReader(pathTXT));
             for (int i = 0; i < 3; i++) {
@@ -160,6 +169,10 @@ public class metaData {
                     plane=line.replaceFirst("Plane: ","");
                 } else if (line.startsWith("Comment: ")){
                     comment=line.replaceFirst("Comment: ","");
+                } else if (line.startsWith("StartName: ")){
+                    startName=line.replace("StartName: ","");
+                    startName.trim();
+                    if (startName.isEmpty()) startName=null;
                 }
             }
          } catch(IOException e){
@@ -174,6 +187,7 @@ public class metaData {
             outMeta.write("Date: "+date+"\n");
             outMeta.write("Plane: "+plane+"\n");
             outMeta.write("Comment: "+comment+"\n");
+            if (startName!=null) outMeta.write("StartName: "+startName+"\n");
             return outMeta;
         } catch (IOException e) {
             return null;
@@ -187,7 +201,8 @@ public class metaData {
     }
 
     public void setParam (Context context, Calendar start, String directory, boolean decimated,
-                boolean namedSensors, boolean colored, boolean html, boolean grapher){
+                boolean namedSensors, boolean colored, boolean html, boolean grapher,
+                          String sn){
         startTime=start;
         SimpleDateFormat sdf=new SimpleDateFormat(context.getString(R.string.StampFmt));
         date=sdf.format(startTime.getTime());
@@ -204,6 +219,7 @@ public class metaData {
         pathHtml=pathMSBlog+"/"+MsbName+".html";
         pathGpx=pathMSBlog+"/"+MsbName+".gpx";
         pathKml=pathMSBlog+"/"+MsbName+".kml";
+        startName=sn;
         return;
     }
 
@@ -271,6 +287,13 @@ public class metaData {
     public String getPathAddr(){
         return pathAddr;
     }
+
+    public String getPathStartGPS(){
+        return pathStartGPS;
+    }
+
+    public String getStartName() {return startName; }
+
     public String getChartX(){
         return ChartX;
     }

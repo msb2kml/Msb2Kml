@@ -34,7 +34,7 @@ numbers that are the indexes of the used columns.
 
 It is possible to zoom and pan using the fingers.
 
-### Acknowledgement
+### Acknowledgment
 
 This module uses the [MPAndroidChart library](https://github.com/PhilJay/MPAndroidChart).
 

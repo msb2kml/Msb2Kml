@@ -1,5 +1,7 @@
 package org.js.msb2kml.ProcessLog;
 
+import android.location.Location;
+
 import org.js.msb2kml.Common.metaData;
 
 import java.io.FileWriter;
@@ -21,7 +23,7 @@ public class kmlGen {
     metaData m;
 
     public boolean prolog(FileWriter out, metaData md, String title,
-                      float lat, float lon, Map<String,String> lineColor){
+                          Location loc, Map<String,String> lineColor){
 
         outKml=out;
         m=md;
@@ -33,8 +35,10 @@ public class kmlGen {
             outKml.write(String.format("<name>%s</name>\n",title));
             outKml.write("    <LookAt>\n");
             outKml.write("      <altitudeMode>relativeToGround</altitudeMode>\n");
-            outKml.write(String.format(Locale.US,"      <longitude>%.8f</longitude>\n",lon));
-            outKml.write(String.format(Locale.US,"      <latitude>%.8f</latitude>\n",lat));
+            outKml.write(String.format(Locale.US,"      <longitude>%.8f</longitude>\n",
+                    loc.getLongitude()));
+            outKml.write(String.format(Locale.US,"      <latitude>%.8f</latitude>\n",
+                    loc.getLatitude()));
             outKml.write("      <altitude>300.00</altitude>\n");
             outKml.write("       <range>300.00</range>\n");
             outKml.write("    </LookAt>\n");

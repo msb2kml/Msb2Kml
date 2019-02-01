@@ -1,11 +1,14 @@
 package org.js.msb2kml.ProcessLog;
 
+import android.location.Location;
+
 import org.js.msb2kml.Common.metaData;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by js on 2/28/17.
@@ -34,16 +37,18 @@ public class gpxGen {
         }
     }
 
-    public boolean pointGpx(Calendar time, float lon, float lat, String height){
+    public boolean pointGpx(Location loc){
+        Calendar cal=Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         try {
-            outGpx.write(String.format(Locale.US,"<trkpt lat=\"%.8f\" lon=\"%.8f\">\n",lat,lon));
-            outGpx.write(String.format(Locale.US," <ele>%s</ele>\n",height));
-            outGpx.write(String.format(Locale.US," <time>%tFT%tTZ</time>\n",time,time));
+            outGpx.write(String.format(Locale.ENGLISH, "<trkpt lat=\"%.8f\" lon=\"%.8f\">\n",
+                    loc.getLatitude(),loc.getLongitude()));
+            outGpx.write(String.format(Locale.ENGLISH," <ele>%.2f</ele>\n",loc.getAltitude()));
+            cal.setTimeInMillis(loc.getTime());
+            outGpx.write(String.format(Locale.ENGLISH," <time>%tFT%tTZ</time>\n",cal,cal));
             outGpx.write("</trkpt>\n");
             return true;
-        } catch (IOException e) {
-            return false;
         }
+        catch (IOException e) { return false; }
     }
 
     public boolean tailGpx(){

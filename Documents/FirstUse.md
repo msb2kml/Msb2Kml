@@ -94,6 +94,15 @@ file is used as default for the meta information.
 A progression bar is displayed while the log file is processed.
 Then the same visualization choices are presented as explained before.
 
+### Progressive setup
+Some sensors put their data on the MSB bus with a
+delay after having been powered up.  
+This could result in output files with a variable number
+of columns.  
+To keep the homogeneity of theses files,
+the application discards all previous data at the appearance
+of a new sensor.
+
 ### Basic use of AddrSens.txt
 This file in the directory MSBlog provides some customization.
 All lines of this file starting with a star "\*" are comments that

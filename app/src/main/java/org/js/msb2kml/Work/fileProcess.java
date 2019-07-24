@@ -66,6 +66,25 @@ public class fileProcess {
     Calendar startTime;
     Handler hand;
 
+    ArrayList <String> Head=new ArrayList<String>();
+    ArrayList <String> Head2=new ArrayList<String>();
+    ArrayList <Integer> Used=new ArrayList<Integer>();
+    ArrayList <String> Data=new ArrayList<String>();
+    ArrayList <Float> minData=new ArrayList<Float>();
+    ArrayList <Float> maxData=new ArrayList<Float>();
+    ArrayList <Float> fData=new ArrayList<Float>();
+    ArrayList <Float> compData=new ArrayList<Float>();
+    ArrayList <String> compHead=new ArrayList<String>();
+    ArrayList <tool> compTool=new ArrayList<tool>();
+
+    public class Var{
+        Character id=null;
+        Object thing=null;
+        Integer index=null;
+    }
+
+    ArrayList<Var> variables=new ArrayList<>();
+
     public void process(Handler handler, String path, metaData meta, Location loc){
 
         lineColor.put("Line00","FFFF0000");
@@ -105,16 +124,6 @@ public class fileProcess {
             TextUtils.StringSplitter comma=new TextUtils.SimpleStringSplitter(',');
             Pattern patSemi=Pattern.compile(";");
             Pattern patColo=Pattern.compile(",");
-            ArrayList <String> Head=new ArrayList<String>();
-            ArrayList <String> Head2=new ArrayList<String>();
-            ArrayList <Integer> Used=new ArrayList<Integer>();
-            ArrayList <String> Data=new ArrayList<String>();
-            ArrayList <Float> minData=new ArrayList<Float>();
-            ArrayList <Float> maxData=new ArrayList<Float>();
-            ArrayList <Float> fData=new ArrayList<Float>();
-            ArrayList <Float> compData=new ArrayList<Float>();
-            ArrayList <String> compHead=new ArrayList<String>();
-            ArrayList <tool> compTool=new ArrayList<tool>();
             String prevFields[]={"0","0"};
             Float prevLat=null;
             Float prevLon=null;
@@ -132,11 +141,28 @@ public class fileProcess {
                     prevPos=position;
                 }
 //------------------------------------------------------------ SETUP1
-                if (line.startsWith("$SETUP1;") && firstLines==0){
+                if (line.startsWith("$SETUP1;")){
+                    if (firstLines!=0){
+                        msg=hand.obtainMessage(21,lineNb,firstLines);
+                        hand.sendMessage(msg);
+                        firstLines=0;
+                    }
+                    variables.clear();
+                    Head.clear();
+                    fData.clear();
+                    Used.clear();
+                    compHead.clear();
+                    compTool.clear();
+                    Head2.clear();
+                    Data.clear();
+                    compData.clear();
+                    minData.clear();
+                    maxData.clear();
                     firstLines++;
                     semiColon.setString(line);
                     int i=-1;
                     int ind=0;
+// var for direct data
                     for (String field : semiColon){
                         i++;
                         if (i==0 || field.isEmpty()) continue;
@@ -157,6 +183,7 @@ public class fileProcess {
                         ind++;
                     }
                     nCol=Used.size();
+// var for functions
                     if (m.getNamedSensors() & !translate.isEmpty()){
                         tb t=new tb();
                         for (triplet tr : translate) {
@@ -167,6 +194,7 @@ public class fileProcess {
                                 ind++;
                             }
                         }
+// identify functions
                         for (triplet tr : translate){
                             if (tr.addr.startsWith(("="))){
                                 tool x=t.toolBox(this,tr.addr,tr.var);
@@ -176,6 +204,7 @@ public class fileProcess {
                                 compTool.add(x);
                             }
                         }
+// check for availibility of var
                         boolean ok=(compTool.size()<1);
                         while (! ok){
                             ok=true;
@@ -202,6 +231,7 @@ public class fileProcess {
                         if (field.matches("-")) continue;
                         line+=semi+field;
                     }
+                    if (outCsv!=null) outCsv.close();
                     outCsv=new FileWriter(m.getPathCsv());
                     outCsv.write(line+"\n");
 //------------------------------------------------------------------- SETUP2
@@ -223,6 +253,13 @@ public class fileProcess {
                         line+=semi+field;
                     }
                     Head.addAll(compHead);
+                    if (outHtml!=null){
+                        if (inTable) h.tableClose();
+                        inTable=false;
+                        h.closeHtml();
+                        htmlMin=-1;
+                        outHtml.close();
+                    }
                     outHtml=new FileWriter(m.getPathHtml());
                     h.beginHtml(outHtml,m,m.getTitle());
                     if (!Grapher) outCsv.write(line+"\n");
@@ -491,13 +528,7 @@ public class fileProcess {
         }
     }
 
-    public class Var{
-        Character id=null;
-        Object thing=null;
-        Integer index=null;
-    }
 
-    ArrayList<Var> variables=new ArrayList<>();
 
     boolean setVar(Character c, Integer t, Object O, Integer ind){
         if (variables!=null) {

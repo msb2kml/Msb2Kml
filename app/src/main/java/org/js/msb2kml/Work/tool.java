@@ -865,6 +865,9 @@ class tb{
             tool t=new GPS();
             if (t.check(f,fields,l)) return t;
             return null;
-        } else return null;
+        } else {
+            if (l!=null) f.delVar(l);
+            return null;
+        }
     }
 }

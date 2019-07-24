@@ -384,7 +384,7 @@ public class Process extends AppCompatActivity {
                 case 21: {
                     value = msg.arg1;
                     Toast toast = Toast.makeText(mActivity.get().context,
-                                 String.format("Extra Setup at line %d", value),
+                                 String.format("New Setup at line %d", value),
                             Toast.LENGTH_LONG);
                     toast.show();
                     break;

@@ -7,9 +7,9 @@ android {
         applicationId "org.js.msb2kml"
         minSdkVersion 16
         targetSdkVersion 26
-        versionName '5.0 Remote GPS'
+        versionName '5.1 Progressive Setup'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 50
+        versionCode 51
     }
     buildTypes {
         release {

@@ -46,6 +46,7 @@ public class htmlGen {
             outHtml.write("<p id=\"bottom\">\n");
             outHtml.write("</body>\n");
             outHtml.write("</html>\n");
+            outHtml=null;
             return true;
         } catch (IOException e) {
             return false;

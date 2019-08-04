@@ -7,9 +7,9 @@ android {
         applicationId "org.js.msb2kml"
         minSdkVersion 16
         targetSdkVersion 26
-        versionName '5.1 Progressive Setup'
+        versionName '5.2 functions ALT, LAT, LON, DIST, NRM, VCT'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 51
+        versionCode 52
     }
     buildTypes {
         release {

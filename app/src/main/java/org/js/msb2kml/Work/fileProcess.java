@@ -5,6 +5,7 @@ import android.os.Message;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import org.js.msb2kml.Common.StartGPS;
 import org.js.msb2kml.Common.metaData;
 import org.js.msb2kml.ProcessLog.gpxGen;
 import org.js.msb2kml.ProcessLog.htmlGen;
@@ -65,6 +66,7 @@ public class fileProcess {
     Location startLoc;
     Calendar startTime;
     Handler hand;
+    String pathStartGPS=null;
 
     ArrayList <String> Head=new ArrayList<String>();
     ArrayList <String> Head2=new ArrayList<String>();
@@ -87,6 +89,9 @@ public class fileProcess {
 
     public void process(Handler handler, String path, metaData meta, Location loc){
 
+        // The order of expression is aabbggrr,
+        // where aa=alpha (00 to ff); bb=blue (00 to ff); gg=green (00 to ff); rr=red (00 to ff).
+
         lineColor.put("Line00","FFFF0000");
         lineColor.put("Line01","FFDA0024");
         lineColor.put("Line02","FFB60048");
@@ -101,6 +106,7 @@ public class fileProcess {
         boolean Grapher=m.getGrapher();
         boolean Html=m.getHtml();
         startTime=m.getStartTime();
+        pathStartGPS=m.getPathStartGPS();
         haver=new Haversine();
         boolean inTable=false;
         String prevAnchor="#top";
@@ -407,6 +413,17 @@ public class fileProcess {
             msg=hand.obtainMessage(666,e.getMessage());
             hand.sendMessage(msg);
         }
+    }
+
+    public Location nameToLoc(String pylone){
+        Location loc=null;
+        if (pathStartGPS==null) return null;
+        StartGPS sGPS=new StartGPS(pathStartGPS);
+        Map<String,Location> startPoints=sGPS.readSG();
+        if (startPoints.isEmpty()) return null;
+        if (!startPoints.containsKey(pylone)) return null;
+        loc=startPoints.get(pylone);
+        return loc;
     }
 
     Exception addPoint(Location loc){

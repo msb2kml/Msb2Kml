@@ -27,6 +27,8 @@ samples. If a variable is used before it is declared, the value
 that it has is thus the one for the previous sample: it is a
 memory function.
 
+The file AddrSens.txt is shared with the application Msb2And.
+
 ### Special variables
 
 There is one variable name that does not need to be defined and is
@@ -36,7 +38,7 @@ traveled distance (km) between points of the GPS track.
 The variable named "%" could be defined and it has a special
 signification for the program. This variable should be in the range
 0 to 100 (out of range values are brought back). This range is divided
-in six bins, each bin corresponding to a color from blue (0) to red (100).
+in eight bins, each bin corresponding to a color from BLUE (0) to RED (100).
 A new segment of the track in the KML file starts when the color
 change as "%" dictates a new bin.
 
@@ -60,11 +62,13 @@ See: [chart](Gallery/MSB_0095_17_4_12.jpg)
 
 #### Colorization of track in KML file.
 
-    =COL,-0.35,0.35,$B;-;   %
+    =COL,-1.0,1.0,$b;-;   %
 
-Colorized here by the smoothed vario.
-+ $B is the smoothed vario (see =SMTH). The range -0.35 to 0.35 m/s
+Colorized here by the vario.
++ $b is the smoothed vario (see =SMTH).  
+The range -1.0 to 1.0 m/s
 for the vario is converted to the range 0 to 100 for the color ($%). 
+Instead of vario, it could be height, speed, ...
 
 See: [Screenshot](Gallery/Screenshot_2017-11-22-15-49-49.jpg)
 
@@ -214,10 +218,102 @@ See the file "RemoteGPS".
 The value that could be printed is only 0.0 or 1.0: 1 if there has
 been no conversion error; otherwise 0.
 
+### Altitude
+
+   =ALT,$G;Altitude
+
++ $G is the result of the reconstruction of the GPS location.
+ It is not used otherwise than to be assured that the reconstruction
+ has been provided.
+
+This extract the altitude (height above sea level) from the current
+GPS location.
+
+### Latitude
+
+   =LAT,$G;Latitude
+
++ $G is the result of the reconstruction of the GPS location.
+ It is not used otherwise than to be assured that the reconstruction
+ has been provided.
+
+This extract the latitude from the current GPS location.  
+
+### Longitude
+
+   =LON,$G;Longitude
+
++ $G is the result of the reconstruction of the GPS location.
+ It is not used otherwise than to be assured that the reconstruction
+ has been provided.
+
+This extract the longitude from the current GPS location;  
+
+### Distance to a turn point
+
+   =DIST,Turnpoint1,$G;Turnpoint 1
+
++ "Turnpoint1" stands for a location named in the file StartGPS.gpx
++ $G is the result of the reconstruction of the GPS location.
+ It is not used otherwise than to be assured that the reconstruction
+ has been provided.
+
+This compute the distance in meters (rounded) from the plane
+to the location of "Turnpoint1".  
+Of course, this function could be invoked for several locations.  
+The location of turnpoints could be entered in the file
+StartGPS.gpx: see the file "RemoteGPS" 
+This function is ignored if a start location is specified (reconstructed GPS track)
+and if the distance from "Turnpoint1" to this start
+location is greater than 10 Km.
+
+### Normalization of the measures from a sensor
+
+   =NRM,-1,-0.8,$Z;Acceleration
+
++ The first parameter (-1) is a multiplication factor.
++ The second parameter (-0.8) is added to the result.
++ $Z is the reading to process.
+
+This computation is performed: ( $Z * (param 1) ) + (param 2)  
+This could be used to revert the sign for a G-Sensor and introduce
+a compensation for the gravity.  
+It could also be used to convert from Centigrade to Fahrenheit.
+
+### Vectorization
+
+   =VCT,$X,$Y,$Z;Vect. Acc.  
+   =VCT,$X,$Z;Vect. Acc.
+
++ $X is a measure along an axis.
++ $Y is a measure along an axis perpendicular to the previous.
++ $Z is a measure along an axis perpendicular to the 2 previous.
+
+The result is the square root of the sum of the squares of the measures.  
+This function could be used with 2 or 3 parameters.
+
+
 ### Note
 
 The functions like =DIFF that make use of current and previous
 values should be at the head of the file.
 The functions like =MEM of =HVL that store values for the next sample
 should be at the bottom of the file.
+
+### Note about the functions relative to GPS
+
+A function that is activated despite missing data has for effect
+a column in the output files filled with "0.0". 
+ 
+The functions =ALT, =LAT, =LON, =DIST and =TRV depends
+on the existence of some data that is not used in the computation.
+This is to prevent them to be activated if the GPS track is not
+available.  
+
+The GPS speed ($K in the example) is an indication that the GPS
+module is present, whatever the method to obtain the track.  
+The success of the reconstruction ($G in the example) exists
+only when the track is reconstructed.  
+Functions =ALT, =LAT an =LON are used mainly for testing.
+
 

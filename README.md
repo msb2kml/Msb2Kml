@@ -45,7 +45,7 @@ downloaded from this repository.
 Alternatively it could be obtained with the documentation from
 the "Releases" pages from the repository.
 
-In each case the application package (such as Msb2Kml50.apk) should be
+In each case the application package (such as Msb2Kml52.apk) should be
 transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.

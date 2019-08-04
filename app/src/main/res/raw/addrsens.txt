@@ -11,12 +11,17 @@ Time;Temps;                 t
  A:07;Vario;                b
  A:08;-
  A:09;Speed GPS;            K
- A:10;Height GPS;           a
- A:11;Dist 2D;              /
+ A:10;Height GPS;           |
+ A:11;-
  A:12;Azimuth;              <
- A:13;Addr13
- A:14;Addr14
+ A:13;Dist 2D;              /
+ A:14;Energy
  A:15;Temp
+
+* g-Sensor
+* A:13;g Z;                  z
+* A:15;g X;                  x
+
 * Secondary (computed) data
 *
 * Differences
@@ -34,7 +39,7 @@ Time;Temps;                 t
 * Traveled distance
 =TRV,$K,$#;Km;              L
 * Colorisation
-=COL,-0.35,0.35,$B;-;       %
+=COL,-1.0,1.0,$B;-;       %
 * Climbing
 =CUMP,$d,$U;Deniv+;         U
 =CUMN,$d,$u;Deniv-;         u
@@ -47,5 +52,15 @@ Time;Temps;                 t
 =MEM,$t;-;                  T
 =MEM,$Z;-;                  H
 =HVL,1,$i,$v,$V;-;          V
-=GPS,$<,$/,$a;GPS
+
+*g-Sensor
+=NRM,-1,-1,$z;accel
+=VCT,$z,$x;vector
+
+* GPS track reconstruction
+=GPS,$<,$/,$|;-;            G
+=ALT,$G;Altitude
+=LAT,$G;Latitude
+=LON,$G;Longitude
+=DIST,BaseA,$G,base A
 

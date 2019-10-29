@@ -16,6 +16,7 @@ import android.widget.Toast;
 import org.js.msb2kml.Common.metaData;
 import org.js.msb2kml.DisplayLog.Browse;
 import org.js.msb2kml.DisplayLog.Chart;
+import org.js.msb2kml.DisplayLog.Vtrk;
 import org.js.msb2kml.R;
 import org.js.msb2kml.Common.listing;
 
@@ -23,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.security.AccessController.getContext;
 
 public class Display extends AppCompatActivity {
 
@@ -57,7 +57,6 @@ public class Display extends AppCompatActivity {
         ar=l.get(gpx);
         if (ar.length >0) {
             AlertDialog.Builder build=new AlertDialog.Builder(this);
-//                        android.R.style.Theme_DeviceDefault_Light_NoActionBar);
             if (gpx) build.setTitle("Choose a flight for the GPX");
             else build.setTitle("Choose a flight");
             build.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -65,7 +64,6 @@ public class Display extends AppCompatActivity {
                         public void onCancel(DialogInterface dialog) {
                             Intent intent = getIntent();
                             setResult(RESULT_CANCELED,intent);
-//                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     })
@@ -74,7 +72,6 @@ public class Display extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = getIntent();
                             setResult(RESULT_CANCELED,intent);
-//                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     })
@@ -120,14 +117,12 @@ public class Display extends AppCompatActivity {
             String pathGpx = l.getGpx(selFile);
             if (pathGpx != null) {
                 vMenu.add(this.getString(R.string.vTrack));
-                vMenu.add(this.getString(R.string.vOsmAnd));
             }
             String pathKml = l.getKml(selFile);
             if (pathKml != null) {
                 vMenu.add(this.getString(R.string.vEarth));
             }
             AlertDialog.Builder build = new AlertDialog.Builder(this);
-//                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
             build.setTitle(l.getBase(selFile))
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
@@ -155,8 +150,6 @@ public class Display extends AppCompatActivity {
     }
 
     boolean Earth=false;
-    boolean OsmAnd=false;
-    boolean TrackBrowser=false;
 
     void extDisp(int which){
         PackageManager Pm=getPackageManager();
@@ -164,8 +157,6 @@ public class Display extends AppCompatActivity {
         for (PackageInfo AI : allPack) {
             String zz=AI.packageName;
             if (zz.contains("earth")) Earth=true;
-            if (zz.contains("osmand")) OsmAnd=true;
-            if (zz.contains("TrackBrowser")) TrackBrowser=true;
         }
         if (vMenu.get(which).contentEquals(this.getString(R.string.vMeta))){
             Intent nt=new Intent(this,Browse.class);
@@ -181,42 +172,10 @@ public class Display extends AppCompatActivity {
             nt.putExtra("MSBlog",pathMSBlog);
             startActivity(nt);
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vTrack))) {
-            if (TrackBrowser) {
-                Uri u=Uri.parse("file://"+l.getGpx(selFile));
-                Intent nt=new Intent("com.qbedded,TrackBrowser.FileSelectionActivity");
-                nt.setClassName("com.qbedded.TrackBrowser","com.qbedded.TrackBrowser.FileSelectionActivity");
-                nt.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-                nt.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-                nt.setData(u);
-                startActivity(nt);
-            } else {
-                Toast toast=Toast.makeText(this,"Track Browser not installed",Toast.LENGTH_LONG);
-                toast.show();
-            }
-        } else if (vMenu.get(which).contentEquals(this.getString(R.string.vOsmAnd))) {
-            if (OsmAnd) {
-                File f=new File(l.getGpx(selFile));
-                Uri u;
-//                if (Build.VERSION.SDK_INT < 24) {
-                    u=Uri.fromFile(f);
-//                } else {
-//                    u=FileProvider.getUriForFile(context,"org.js.msb2kml.provider", f);
-//                }
-                Intent nt= new Intent(Intent.ACTION_VIEW);
-                nt.setClassName("net.osmand.plus",
-                        "net.osmand.plus.activities.MapActivity");
-                nt.setData(u);
-                nt.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-                nt.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-                nt.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-                startActivity(nt);
-            } else {
-                Toast toast=Toast.makeText(this,"OsmAnd not installed",Toast.LENGTH_LONG);
-                toast.show();
-            }
+            Intent nt=new Intent(this,Vtrk.class);
+            nt.putExtra("MsbName",l.getBase(selFile));
+            nt.putExtra("MSBlog",pathMSBlog);
+            startActivity(nt);
         }else {
             if (Earth) {
                 File f=new File(l.getKml(selFile));

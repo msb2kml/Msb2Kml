@@ -6,7 +6,7 @@
     <string name="vMeta">META File</string>
     <string name="vHtml">HTML Browser</string>
     <string name="vChart">CSV Charts</string>
-    <string name="vTrack">Track Browser</string>
-    <string name="vOsmAnd">OsmAnd Application</string>
+    <string name="vTrack">GPX on map</string>
     <string name="vEarth">Google Earth</string>
+    <string name="title_activity_vtrk">Vtrk</string>
 </resources>

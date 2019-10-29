@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
 import java.io.FileReader;
@@ -54,6 +55,7 @@ public class metaData {
     String pathTXT;
     String pathStartGPS;
     String pathMSBlog;
+    ArrayList<String> extrmString=new ArrayList<>();
     String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
 
     public metaData(String path){
@@ -147,16 +149,30 @@ public class metaData {
     }
 
     public boolean extract (Context context, String name){
+        String patrnExtrm="^[^:]+:{1}[^;]+;{1}[^;]+$";
+        Pattern pExtrm=Pattern.compile(patrnExtrm);
         MsbName=name;
         pathTXT=pathMSBlog+"/"+MsbName+".txt";
         pathHtml=pathMSBlog+"/"+MsbName+".html";
         pathGpx=pathMSBlog+"/"+MsbName+".gpx";
         pathKml=pathMSBlog+"/"+MsbName+".kml";
+        date=null;
+        plane=null;
+        comment=null;
+        startName=null;
+        startTime=null;
+        extrmString.clear();
+        String line="";
         try {
             BufferedReader f=new BufferedReader(new FileReader(pathTXT));
-            for (int i = 0; i < 3; i++) {
-                String line=f.readLine();
+            while (line!=null) {
+                line=f.readLine();
+                if (line==null) break;
+                if (line.length()==0) continue;
+                if (line.contains("**** AddrSens.txt *****")) break;
+                Matcher match=pExtrm.matcher(line);
                 if (line.startsWith("Date: ")){
+                    startTime=Calendar.getInstance();
                     date=line.replaceFirst("Date: ","");
                     SimpleDateFormat sdf=new SimpleDateFormat(context.getString(R.string.StampFmt));
                     try {
@@ -173,6 +189,8 @@ public class metaData {
                     startName=line.replace("StartName: ","");
                     startName.trim();
                     if (startName.isEmpty()) startName=null;
+                } else if (match.find()) {
+                    extrmString.add(line);
                 }
             }
          } catch(IOException e){
@@ -293,6 +311,8 @@ public class metaData {
     }
 
     public String getStartName() {return startName; }
+
+    public ArrayList<String> getExtrmString(){ return extrmString; }
 
     public String getChartX(){
         return ChartX;

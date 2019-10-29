@@ -45,7 +45,7 @@ downloaded from this repository.
 Alternatively it could be obtained with the documentation from
 the "Releases" pages from the repository.
 
-In each case the application package (such as Msb2Kml52.apk) should be
+In each case the application package (such as Msb2Kml53.apk) should be
 transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.
@@ -53,12 +53,9 @@ to install it.
 Other applications should be installed for a better experience;
 all of them are free.
 
-To look at GPS track in GPX files:
-[GPS Track Browser and Viewer](https://play.google.com/store/apps/details?id=com.qbedded.TrackBrowser) from Google Play.
-
-To look a GPS track in GPX files and display them on off-line
-map overlays: [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand)
-from Google Play or [OsmAnd](https://f-droid.org/repository/browse/?fdfilter=osmand&fdid=net.osmand.plus) from F-droid.
+To look at GPS track in GPX files and display them on an
+overlay of topographic maps:
+[Msb2Map](https://github.com/msb2kml/Msb2Map/) from the same author.
 
 To look at GPS track in KML files: [Google Earth](https://play.google.com/store/apps/details?id=com.google.earth).
 
@@ -70,7 +67,7 @@ Vario, smoothed vario and height:
 
 ![MSB_069](Documents/Gallery/MSB_0069_0_4_10_3.jpg)
 
-Slopesoaring:
+Slope soaring:
 
 ![Google Earth](Documents/Gallery/Screenshot_2017-11-22-15-49-49.jpg)
 

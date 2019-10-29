@@ -37,10 +37,11 @@ traveled distance (km) between points of the GPS track.
 
 The variable named "%" could be defined and it has a special
 signification for the program. This variable should be in the range
-0 to 100 (out of range values are brought back). This range is divided
-in eight bins, each bin corresponding to a color from BLUE (0) to RED (100).
+0.0 to 100.0.
+There is a relation between the value of this variable
+and a color: from BLUE (0%) through GREEN to RED (100%) in 12 levels.
 A new segment of the track in the KML file starts when the color
-change as "%" dictates a new bin.
+change as "%" dictates a new level.
 
 
 ### List of functions
@@ -55,6 +56,7 @@ Each function is presented as it could be used on a line of the file.
 + $v is the current voltage.
 + $V is the last voltage when the current was less than the threshold
  parameter (1 ampere in this case). See =HVL for $V.
+
 Hint: if there is a too high spike when the current is cut off,
 specify a higher threshold.
 
@@ -65,7 +67,9 @@ See: [chart](Gallery/MSB_0095_17_4_12.jpg)
     =COL,-1.0,1.0,$b;-;   %
 
 Colorized here by the vario.
+
 + $b is the smoothed vario (see =SMTH).  
+
 The range -1.0 to 1.0 m/s
 for the vario is converted to the range 0 to 100 for the color ($%). 
 Instead of vario, it could be height, speed, ...
@@ -153,6 +157,7 @@ See: [Chart](Gallery/MSB_0095_17_4_12.jpg)
 #### Energy (as limited for F5B and F5D)
 
     =NRJ,$w,$s,$j;W.min;   j
+
 + $w is the power (see =PROD).
 + $s is the difference of time from the previous sample (see =DIFF).
 + $j is the energy itself.
@@ -165,6 +170,7 @@ See: [Chart](Gallery/MSB_0095_0_4_11.jpg)
 #### Product (here power) of 2 values
 
     =PROD,$i,$v;Watt;       w
+
 + $i is here the current.
 + $v is here the voltage.
 
@@ -184,6 +190,7 @@ See: [Chart](Gallery/MSB_0069_0_4_10_3.jpg)
 #### Time scale covering only the flight without motor
 
     =SOA,1,$i,$s,$m;Soar s; m
+
 + $i is the current.
 + $s is the difference of time from the previous sample (see =DIFF).
 + $m is the new time scale itself.
@@ -205,12 +212,12 @@ See: [Chart](Gallery/MSB_0095_17_4_12.jpg)
 
 #### Remote GPS reconstruction
 
-    =GPS,$<,$/,$a;GPS
+    =GPS,$<,$/,$|;GPS
     
 + $< is the azimuth from the pilot to the plane computed by
  the GPS module.
 + $/ is the distance 2D from the pilot to the plane (module GPS).
-+ $a is the altitude measured by the GPS.
++ $| is the altitude measured by the GPS.
 
 This compute the real location (lat, long, alt) from the telemetry
 data instead of direct data if the starting location is provided.
@@ -261,7 +268,7 @@ This extract the longitude from the current GPS location;
 This compute the distance in meters (rounded) from the plane
 to the location of "Turnpoint1".  
 Of course, this function could be invoked for several locations.  
-The location of turnpoints could be entered in the file
+The location of turn points could be entered in the file
 StartGPS.gpx: see the file "RemoteGPS" 
 This function is ignored if a start location is specified (reconstructed GPS track)
 and if the distance from "Turnpoint1" to this start

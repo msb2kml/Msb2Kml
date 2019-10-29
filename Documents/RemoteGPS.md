@@ -8,7 +8,7 @@ data is not available.
 The Msb2Kml application is now able to reconstruct the location
 data from the telemetry data.
 This is also true for the log files recorded by the sibling
-application MSB2And.
+application Msb2And.
 The following explanations are relative to the reconstruction
 of the location data. 
 
@@ -41,17 +41,19 @@ The bottom panel of the first window of the application is used
 to prepare a location.
 
 There are three methods available to record such a location:
+
 + use the GPS of the tablet or smartphone.
 + write the location known by another mean (GPS, map, ...).
 + copy the location from a previously processed flight with
  the logger on board.
  
-The file StartGPS.gpx could be opened by an application such as OsmAnd
+The file StartGPS.gpx could be opened by an application such as Msb2Map
 to check the locations on a map.
   
 # Location with GPS of device
 
 You could be asked to modify two settings:
+
 + Enable fine location: allow the GPS to work.
 + Give the application the access to the location.
 
@@ -63,8 +65,8 @@ The default name is a combination of the date and hour.
 
 # Entering a location
 
-You are presented with a form to enter the latitude and longitude in decimal degrees,
-and the altitude in meters.
+You are presented with a form to enter the latitude and longitude in
+decimal degrees, and the altitude in meters.
 And a meaningful and unique name. The default name is a combination
 of the date and hour.
 If the location you have is in degrees, minutes, seconds you could
@@ -86,6 +88,7 @@ name is a combination of the date and hour when the fix has been taken.
 # Processing
 
 There are two requirements for the reconstruction of the location data:
+
 + The AddrSens.txt file should contain an expression "=GPS" with
  valid parameters.
 + The name of a location defined in the file StartGPS.txt should have been

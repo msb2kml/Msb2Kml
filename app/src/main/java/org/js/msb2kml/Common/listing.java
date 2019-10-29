@@ -5,8 +5,6 @@ import android.content.Context;
 import android.widget.Toast;
 
 import org.js.msb2kml.BrowseLog.filterMeta;
-import org.js.msb2kml.Common.metaData;
-import org.js.msb2kml.R;
 
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -46,6 +44,9 @@ public class listing {
     }
 
     public String[] get(boolean gpx){
+        String flag="";
+        String tName;
+        File t;
         Liste.clear();
         FileListe.clear();
         File f1=new File(pathMSBlog);
@@ -56,13 +57,35 @@ public class listing {
                 Arrays.sort(s);
                 metaData m=new metaData(pathMSBlog);
                 for (int i = 0; i < s.length; i++) {
+                    flag="";
                     String sName=s[i].replace(".txt","");
                     if (!m.extract(context,sName)) continue;
-                    if (gpx){
-                        File g=new File(m.getPathGpx());
-                        if (!g.exists()) continue;
+                    tName=pathMSBlog+"/"+sName+"f.csv";
+                    t=new File(tName);
+                    if (t.exists()) flag="F";
+                    else {
+                        tName=pathMSBlog+"/"+sName+"d.csv";
+                        t=new File(tName);
+                        if (t.exists()) flag="D";
+                        else flag="_";
                     }
-                    String line=sName+" / "+m.getDay()+" / "+m.getPlane()+" / "+m.getComment();
+                    tName=pathMSBlog+"/"+sName+".html";
+                    t=new File(tName);
+                    if (t.exists()) flag+="H";
+                    else flag+="_";
+                    tName=pathMSBlog+"/"+sName+".gpx";
+                    t=new File(tName);
+                    if (t.exists()) flag+="G";
+                    else {
+                        flag+="_";
+                        if (gpx) continue;
+                    }
+                    tName=pathMSBlog+"/"+sName+".kml";
+                    t=new File(tName);
+                    if (t.exists()) flag+="K";
+                    else flag+="_";
+                    String line=flag+" "+sName+" / "+m.getDay()+" / "+m.getPlane()+
+                            " / "+m.getComment();
                     Liste.add(line);
                     FileListe.add(s[i]);
                 }

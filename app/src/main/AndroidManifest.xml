@@ -9,7 +9,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -23,23 +23,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BrowseLog.Display"
-            android:windowSoftInputMode="stateHidden" >
+        <activity
+            android:name=".BrowseLog.Display"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayLog.Browse"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity android:name=".ProcessLog.Process"
-            android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".FileSelect.Selector"
-            android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".DisplayLog.Chart"
-            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".DisplayLog.Browse"
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity
+            android:name=".ProcessLog.Process"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".FileSelect.Selector"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".DisplayLog.Chart"
+            android:windowSoftInputMode="stateHidden" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -60,7 +64,12 @@
         <activity
             android:name=".Common.CopyFix"
             android:windowSoftInputMode="stateHidden" />
-
+        <activity
+            android:name=".DisplayLog.Vtrk"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="locked"
+            android:configChanges="orientation|screenSize">
+        </activity>
     </application>
 
 </manifest>

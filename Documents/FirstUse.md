@@ -30,7 +30,8 @@ From a logger file named "MSB_XXXX.csv" the application
 produce the files:
 
 * "MSB_XXXX.txt": this is the meta file. It contains the date,
-       hour of the flight, name of the plane, comment.
+       hour of the flight, name of the plane, comment, name
+       of the start location.
        It contains also the minimum and maximum value observed
        for each parameter and also a copy of "AddrSens.txt"
        that has been used for the processing.
@@ -63,15 +64,22 @@ back to the upper level.
 The application look in the directory MSBlog for all files with
 a name of the form "MSB_XXXX.txt" (meta files). 
 For each file are displayed: the date of the flight, the name of
-the plane and the comment.
+the plane and the comment. The file name is preceded by some
+characters:
+
++ D: the file MSB_XXXXd.csv is available.
++ F: the file MSB_XXXXf.csv is available.
++ H: the file MSB_XXXX.html is available.
++ G: the file MSB_XXXX.gpx is available.
++ K: the file MSB_XXXX.kml is available.
+
 A choice of visualization options is presented when a file is selected.
 The meta file and the HTML file are viewed with the HtmlViewer.
 Use the back touch to get out of this module.
-The CSV file is viewed with the Chart module: see explanations in Chart.txt.
-The GPX file could be viewed with "Track browser" (on-line or with
-cached maps/photos) and with "OsmAnd" (off-line maps).
-"Track browser" and "OsmAnd" could display some KML files but not
-segmented tracks.
+The CSV file is viewed with the Chart module: see explanations in the
+file Chart in this directory.
+The GPX file could be viewed with the "GPX on map" module: see the
+file GpxOnMap in this directory.  
 Finally, the KML file could be viewed with "Google Earth". 
 The last version of GE permits to view the track in 3D.
 And, out of the application, this file could also be transferred to

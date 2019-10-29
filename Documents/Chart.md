@@ -3,7 +3,7 @@ This module is used to plot the data from the processed CSV files.
 
 ### General disposition
 It is possible to plot any number of columns as Y versus an X column.
-The graph is auto scaling. For the Y two simultaneous scales are
+The graph is auto scaling. For the Y, two simultaneous scales are
 possible: one is displayed on the left of the plot and the
 other on the right. Each curve is attributed a color from the
 list: black, blue, cyan, magenta, green, yellow and red.

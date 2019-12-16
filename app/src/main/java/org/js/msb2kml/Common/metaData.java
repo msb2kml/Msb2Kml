@@ -160,7 +160,6 @@ public class metaData {
         plane=null;
         comment=null;
         startName=null;
-        startTime=null;
         extrmString.clear();
         String line="";
         try {

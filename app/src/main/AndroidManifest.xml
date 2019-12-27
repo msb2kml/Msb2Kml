@@ -37,7 +37,7 @@
             android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".ProcessLog.Process"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".FileSelect.Selector"
             android:windowSoftInputMode="stateHidden" />

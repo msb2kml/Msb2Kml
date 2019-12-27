@@ -62,29 +62,29 @@ public class listing {
                     if (!m.extract(context,sName)) continue;
                     tName=pathMSBlog+"/"+sName+"f.csv";
                     t=new File(tName);
-                    if (t.exists()) flag="F";
+                    if (t.exists()) flag="f";
                     else {
                         tName=pathMSBlog+"/"+sName+"d.csv";
                         t=new File(tName);
-                        if (t.exists()) flag="D";
+                        if (t.exists()) flag="d";
                         else flag="_";
                     }
                     tName=pathMSBlog+"/"+sName+".html";
                     t=new File(tName);
-                    if (t.exists()) flag+="H";
+                    if (t.exists()) flag+="h";
                     else flag+="_";
                     tName=pathMSBlog+"/"+sName+".gpx";
                     t=new File(tName);
-                    if (t.exists()) flag+="G";
+                    if (t.exists()) flag+="g";
                     else {
                         flag+="_";
                         if (gpx) continue;
                     }
                     tName=pathMSBlog+"/"+sName+".kml";
                     t=new File(tName);
-                    if (t.exists()) flag+="K";
+                    if (t.exists()) flag+="k";
                     else flag+="_";
-                    String line=flag+" "+sName+" / "+m.getDay()+" / "+m.getPlane()+
+                    String line="("+flag+") "+sName+" / "+m.getDay()+" / "+m.getPlane()+
                             " / "+m.getComment();
                     Liste.add(line);
                     FileListe.add(s[i]);

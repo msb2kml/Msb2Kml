@@ -67,11 +67,11 @@ For each file are displayed: the date of the flight, the name of
 the plane and the comment. The file name is preceded by some
 characters:
 
-+ D: the file MSB_XXXXd.csv is available.
-+ F: the file MSB_XXXXf.csv is available.
-+ H: the file MSB_XXXX.html is available.
-+ G: the file MSB_XXXX.gpx is available.
-+ K: the file MSB_XXXX.kml is available.
++ d: the file MSB_XXXXd.csv is available.
++ f: the file MSB_XXXXf.csv is available.
++ h: the file MSB_XXXX.html is available.
++ g: the file MSB_XXXX.gpx is available.
++ k: the file MSB_XXXX.kml is available.
 
 A choice of visualization options is presented when a file is selected.
 The meta file and the HTML file are viewed with the HtmlViewer.
@@ -122,6 +122,8 @@ a column as delivered by the Flight Logger: "Time" and " A:00" to " A:16"
 (note the space). If the Logger heading match a first field, it is replaced
 with the second field. But if the second field is a minus "-" the column
 is hidden from the listings (but could be used for computation).
+An exception is made for the first field: it is always reproduced
+in the CSV file as the time has a function in some display module.
 If the third field is present it should be a single character (any character,
 any case). This character is used as name of a variable that takes the
 value of the column for each sample: see the advanced usage.

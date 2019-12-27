@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+//    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.js.msb2kml"
         minSdkVersion 16
         targetSdkVersion 26
-        versionName '5.4 Bug correction'
+        versionName '5.5 ScatterGraph and skip setup'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 54
+        versionCode 55
     }
     buildTypes {
         release {
@@ -22,14 +22,14 @@ android {
 }
 
 dependencies {
-    compile project(':MPChartLib')
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:design:26.1.0'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation project(':MPChartLib')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:design:26.1.0'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:support-core-utils:25.2.0'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.1.3'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:support-core-utils:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
 }

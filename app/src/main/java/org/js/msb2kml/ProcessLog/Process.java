@@ -1,5 +1,6 @@
 package org.js.msb2kml.ProcessLog;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -232,12 +234,20 @@ public class Process extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Plane=pl.getText().toString();
                         Comment=co.getText().toString();
+                        InputMethodManager imm = (InputMethodManager)
+                                context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(pl.getWindowToken(),0);
+                        imm.hideSoftInputFromWindow(co.getWindowToken(),0);
                         paramOut();
                     }
                 })
                 .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        InputMethodManager imm = (InputMethodManager)
+                                context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(pl.getWindowToken(),0);
+                        imm.hideSoftInputFromWindow(co.getWindowToken(),0);
                         finish();
                     }
                 })

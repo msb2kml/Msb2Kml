@@ -228,11 +228,19 @@ public class fileProcess {
                     }
                     String semi="";
                     line="";
+                    for (int j=0;j<Head.size();j++){
+                        String field=Head.get(j);
+                        if (j!=0 && field.matches("-")) continue;
+                        line+=semi+field;
+                        semi=";";
+                    }
+                    /*
                     for (String field : Head){
                         if (field.matches("-")) continue;
                         line+=semi+field;
                         semi=";";
                     }
+                     */
                     for (String field : compHead){
                         if (field.matches("-")) continue;
                         line+=semi+field;

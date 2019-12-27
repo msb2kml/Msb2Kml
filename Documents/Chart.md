@@ -9,7 +9,10 @@ other on the right. Each curve is attributed a color from the
 list: black, blue, cyan, magenta, green, yellow and red.
 The color of curves related to the left scale is attributed starting
 with black and starting with red for the curves related to the
-right scale.
+right scale.  
+Usually the values on the X axis are ordered (time, ...) and the graph
+is composed of continuous lines. If theses values are not ordered,
+there is no line but distinct points for each sample.
 
 ### Axis attribution
 Columns are referenced by their heading. The columns that are
@@ -26,11 +29,15 @@ And the extreme right button has the similar function for the right axis.
 The button at the right of the middle button is used to quit this
 module and return to the previous screen.
 
-The button at the left of the middle button let you save the graph
-as an image in the Gallery of your device for sharing or archive.
-This image is saved in a sub directory Msb2Kml. The name is
-composed from the base of the name of the log file (MSB_XXXX) and
-numbers that are the indexes of the used columns.
+The button at the left of the middle button brings a menu to perform
+one of two actions:
++ Save as picture: the current graph is saved as a picture in the Gallery
+ of your device for sharing or archive. This image is saved in a 
+ sub directory Msb2Kml. The name is composed from the base of the name 
+ of the log file (MSB_XXXX) and numbers that are the indexes of the used columns.
++ Skip some time: the first instants of the recording are skipped as
+ some readings recorded while the plane is set up could pollute the
+ scales of the graph.
 
 It is possible to zoom and pan using the fingers.
 

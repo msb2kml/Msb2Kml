@@ -10,12 +10,15 @@ import android.os.Bundle;
 import org.js.msb2kml.FileSelect.navDir;
 import org.js.msb2kml.R;
 
+import java.io.File;
+
 public class Selector extends AppCompatActivity {
 
-    navDir nav=new navDir();
+    navDir nav=null;
     String theList[];
     int theSelected=-1;
     String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+    String rmvPath=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,13 +26,20 @@ public class Selector extends AppCompatActivity {
         setContentView(R.layout.activity_selector);
         Intent intent=getIntent();
         String currentDir=intent.getStringExtra("CurrentDir");
-        if (currentDir==null) currentDir=exPath;
+        rmvPath=System.getenv("SECONDARY_STORAGE");
+//        rmvPath="/Removable";
+        if (rmvPath!=null){
+            File f=new File(rmvPath);
+            if (!f.exists() || !f.isDirectory() || !f.canRead()) rmvPath=null;
+        }
+        nav=new navDir(exPath,rmvPath);
+//        if (currentDir==null) currentDir=exPath;
         nav.setCurDir(currentDir);
         String Mask=intent.getStringExtra("Mask");
         nav.setMask(Mask);
         Boolean WithDir=intent.getBooleanExtra("WithDir",false);
         if (WithDir) selWtDir();
-        selNoDir();
+        else selNoDir();
     }
 
     void selWtDir(){

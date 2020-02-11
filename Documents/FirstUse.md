@@ -1,17 +1,27 @@
 # First use
 ### Permissions
 On the most recent versions of Android the permission to read and write
-files is requested at the first use.
+files is requested at the first use. The permission to obtain the
+position from the GPS sensor is also needed for the "RemoteGPS" feature.
 
 ### Source directory
 It is possible to process log files directly from the SD card
-removed from the Flight Logger and mounted on the tablet.
-But it is preferable to create a dedicated directory on the tablet
+removed from the Flight Logger and mounted on the tablet or a
+USB card reader.
+It is also possible to create a dedicated directory on the tablet
 and to copy the files from the SD card to this directory:
 it is then easier to re-process some file.
 Only the files with a name matching the pattern
-"MSB_XXXX.csv" are considered.
-The program remembers in its preferences the last used directory.
+"MSB\_XXXX.csv" are considered.
+The program remembers the last used directory in its preferences.
+
+The selection of the file to process is performed through the
+use of a specialized file explorer. It is possible to go "up"
+or "down" in the hierarchy of directories. Two "root" directories
+are possible: the local storage (usually /storage/emulated/0/) and
+the remote storage (usually /remote/).  
+The application switch from one to the other when going "up" from
+the root.
 
 ### Output directory
 All the files produced by the application are placed in
@@ -26,28 +36,28 @@ the program proposes to create a default one.
 
 # Basic use
 ### Product files
-From a logger file named "MSB_XXXX.csv" the application
+From a logger file named "MSB\_XXXX.csv" the application
 produce the files:
 
-* "MSB_XXXX.txt": this is the meta file. It contains the date,
+* "MSB\_XXXX.txt": this is the meta file. It contains the date,
        hour of the flight, name of the plane, comment, name
        of the start location.
        It contains also the minimum and maximum value observed
        for each parameter and also a copy of "AddrSens.txt"
        that has been used for the processing.
-* "MSB_XXXX.html": this is an HTML file of all the data presented
+* "MSB\_XXXX.html": this is an HTML file of all the data presented
        in tables, one table by minute of flight with navigation
        links.
-* "MSB_XXXXf.csv": this is essentially a copy of the input
+* "MSB\_XXXXf.csv": this is essentially a copy of the input
        file cleaned off the GPS data and transformed for further
        processing: there is only one line of headings, the
        decimal separator is the dot (12.34) instead of the
        comma (12,34).
-* "MSB_XXXXd.csv": this is the same as the previous file but decimated
+* "MSB\_XXXXd.csv": this is the same as the previous file but decimated
        to 1 measure per second: this is generally sufficient and
        faster to display. Only one of the "f" or "d" file is produced.
-* "MSB_XXXX.gpx": this is the track in a GPX file (if GPS present).
-* "MSB_XXXX.kml": the track (if GPS present) in a KML file as a chain
+* "MSB\_XXXX.gpx": this is the track in a GPX file (if GPS present).
+* "MSB\_XXXX.kml": the track (if GPS present) in a KML file as a chain
        of colored segments.
 
 ### Launching the application
@@ -62,22 +72,31 @@ back to the upper level.
 
 ### Browsing processed logs
 The application look in the directory MSBlog for all files with
-a name of the form "MSB_XXXX.txt" (meta files). 
+a name of the form "MSB\_XXXX.txt" (meta files). 
 For each file are displayed: the date of the flight, the name of
 the plane and the comment. The file name is preceded by some
 characters:
 
-+ d: the file MSB_XXXXd.csv is available.
-+ f: the file MSB_XXXXf.csv is available.
-+ h: the file MSB_XXXX.html is available.
-+ g: the file MSB_XXXX.gpx is available.
-+ k: the file MSB_XXXX.kml is available.
++ d: the file MSB\_XXXXd.csv is available.
++ f: the file MSB\_XXXXf.csv is available.
++ h: the file MSB\_XXXX.html is available.
++ g: the file MSB\_XXXX.gpx is available.
++ k: the file MSB\_XXXX.kml is available.
 
 A choice of visualization options is presented when a file is selected.
-The meta file and the HTML file are viewed with the HtmlViewer.
-Use the back touch to get out of this module.
+
+There is a specialized viewer for the meta file.
+The 3 parts are specifically displayed:
+
++ the first part contains the conditions of the 
+ flight (start instant, plane name, etc...).
++ the second part concerns the minimum and maximum of each parameter.
++ the third part (available through a button) contains a copy of
+ the AddrSens.txt that has been used for the processing.
+
+The HTML file is viewed with the HtmlViewer.  
 The CSV file is viewed with the Chart module: see explanations in the
-file Chart in this directory.
+file Chart in this directory.  
 The GPX file could be viewed with the "GPX on map" module: see the
 file GpxOnMap in this directory.  
 Finally, the KML file could be viewed with "Google Earth". 
@@ -90,10 +109,9 @@ alternating red and blue. There are other possibilities with
 the advanced usage.
 
 ### Processing a new log
-A specialized file manager shows only files with the appropriate
-form of name and directories. At the first ever use
-the display start at the /storage directory; at subsequent uses it
-starts at the last directory used. The "../" entry move up in the hierarchy.
+As seen before, the file to process is selected with a specialized
+file explorer.
+
 When a file has been selected there is a succession of choices
 for the processing. Usually the default choices are to be used.
 One has then to provide the meta information. If a corresponding

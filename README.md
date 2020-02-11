@@ -32,7 +32,8 @@ It acts as a bridge between the MSB format and the KML
 format used by Google Earth: thus the name "MSB to KML".
 
 This is a standard Android/Java application that request only the permission
-to read and write files. You could have to check in the settings
+to read and write files and also to obtain the geographic position
+from the GPS sensor. You could have to check in the settings
 of the device that the installation of applications from other
 sources than Google Play is permitted.
 
@@ -45,7 +46,7 @@ downloaded from this repository.
 Alternatively it could be obtained with the documentation from
 the "Releases" pages from the repository.
 
-In each case the application package (such as Msb2Kml53.apk) should be
+In each case the application package (such as Msb2Kml56.apk) should be
 transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.

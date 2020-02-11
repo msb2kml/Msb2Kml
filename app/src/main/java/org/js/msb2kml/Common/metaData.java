@@ -57,6 +57,7 @@ public class metaData {
     String pathMSBlog;
     ArrayList<String> extrmString=new ArrayList<>();
     String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+    ArrayList<String> addrSens=new ArrayList<>();
 
     public metaData(String path){
 
@@ -161,6 +162,8 @@ public class metaData {
         comment=null;
         startName=null;
         extrmString.clear();
+        addrSens.clear();
+        Boolean inAddr=false;
         String line="";
         try {
             BufferedReader f=new BufferedReader(new FileReader(pathTXT));
@@ -168,28 +171,35 @@ public class metaData {
                 line=f.readLine();
                 if (line==null) break;
                 if (line.length()==0) continue;
-                if (line.contains("**** AddrSens.txt *****")) break;
-                Matcher match=pExtrm.matcher(line);
-                if (line.startsWith("Date: ")){
-                    startTime=Calendar.getInstance();
-                    date=line.replaceFirst("Date: ","");
-                    SimpleDateFormat sdf=new SimpleDateFormat(context.getString(R.string.StampFmt));
-                    try {
-                        Date dd=sdf.parse(date,new ParsePosition(0));
-                        startTime.setTime(dd);
-                    } catch (Exception e) {
-                        startTime=Calendar.getInstance();
+                if (inAddr) {
+                    addrSens.add(line);
+                } else {
+                    if (line.contains("**** AddrSens.txt *****")) {
+                        inAddr=true;
+                        continue;
                     }
-                } else if (line.startsWith("Plane: ")){
-                    plane=line.replaceFirst("Plane: ","");
-                } else if (line.startsWith("Comment: ")){
-                    comment=line.replaceFirst("Comment: ","");
-                } else if (line.startsWith("StartName: ")){
-                    startName=line.replace("StartName: ","");
-                    startName.trim();
-                    if (startName.isEmpty()) startName=null;
-                } else if (match.find()) {
-                    extrmString.add(line);
+                    Matcher match = pExtrm.matcher(line);
+                    if (line.startsWith("Date: ")) {
+                        startTime = Calendar.getInstance();
+                        date = line.replaceFirst("Date: ", "");
+                        SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.StampFmt));
+                        try {
+                            Date dd = sdf.parse(date, new ParsePosition(0));
+                            startTime.setTime(dd);
+                        } catch (Exception e) {
+                            startTime = Calendar.getInstance();
+                        }
+                    } else if (line.startsWith("Plane: ")) {
+                        plane = line.replaceFirst("Plane: ", "");
+                    } else if (line.startsWith("Comment: ")) {
+                        comment = line.replaceFirst("Comment: ", "");
+                    } else if (line.startsWith("StartName: ")) {
+                        startName = line.replace("StartName: ", "");
+                        startName.trim();
+                        if (startName.isEmpty()) startName = null;
+                    } else if (match.find()) {
+                        extrmString.add(line);
+                    }
                 }
             }
          } catch(IOException e){
@@ -321,5 +331,9 @@ public class metaData {
     }
     public Set<String> getChartYR(){
         return ChartYR;
+    }
+
+    public ArrayList<String> getAddrSens(){
+        return addrSens;
     }
 }

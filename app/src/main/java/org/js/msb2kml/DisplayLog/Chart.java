@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -27,6 +28,7 @@ import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.github.mikephil.charting.utils.EntryXComparator;
 
 import org.js.msb2kml.Common.listing;
 import org.js.msb2kml.Common.metaData;
@@ -37,7 +39,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -60,9 +65,10 @@ public class Chart extends AppCompatActivity {
     ArrayList<String> yrHead=new ArrayList<String>();
     SharedPreferences pref=null;
     String fieldsHead[]=null;
-    String[] skipItems={"none","1 min.","2 min.","10 min."};
-    Float[] skipTime={null,60.0f,120.0f,600.0f};
-    int skipIndex=0;
+    Boolean sortedX=true;
+    Integer rangeVal=null;
+    Float minRange=null;
+    Float maxRange=null;
     int colors[]={Color.BLACK,Color.BLUE,Color.CYAN,Color.MAGENTA,
                                   Color.GREEN,0XFFC05800,Color.RED};
 
@@ -139,7 +145,7 @@ public class Chart extends AppCompatActivity {
         buttonG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActDialg();
+                if (!chart.isEmpty()) saveGraph();
             }
         });
         Button buttonB=(Button) findViewById(R.id.button5);
@@ -165,6 +171,10 @@ public class Chart extends AppCompatActivity {
     }
 
     void selectX(){
+        if (sortedX && rangeVal!=null){
+            minRange=chart.getLowestVisibleX();
+            maxRange=chart.getHighestVisibleX();
+        }
         AlertDialog.Builder build=new AlertDialog.Builder(this);
 //                    android.R.style.Theme_DeviceDefault_Light_NoActionBar);
         build.setTitle("Select the column for X axis")
@@ -179,6 +189,7 @@ public class Chart extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         xHead=fieldsHead[which];
                         chart.clear();
+                        chart.fitScreen();
                         mkChart();
                     }
                 });
@@ -255,52 +266,8 @@ public class Chart extends AppCompatActivity {
         build.show();
     }
 
-    void ActDialg(){
-        String[] actItems={"Record chart as picture in Galery",
-                           "Specify a setup time to skip"};
-        AlertDialog.Builder build=new AlertDialog.Builder(this);
-        build.setTitle("Action to perform:");
-        build.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                chart.clear();
-                mkChart();
-            }
-        })
-                .setItems(actItems, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which==0){
-                            if (!chart.isEmpty()) saveGraph();
-                        } else SkipDialg();
-                    }
-                });
-        build.show();
-    }
-
-    void SkipDialg(){
-        AlertDialog.Builder build=new AlertDialog.Builder(this);
-        build.setTitle("Setup time to skip");
-        build.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                chart.clear();
-                mkChart();
-            }
-        })
-                .setItems(skipItems, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        skipIndex=which;
-                        chart.clear();
-                        mkChart();
-                    }
-                });
-        build.show();
-    }
-
     void mkChart(){
-        boolean sortedX=true;
+        sortedX=true;
         Float prevX=null;
         CombinedData combData = new CombinedData();
         int indX=(int)headings.get(xHead);
@@ -308,7 +275,8 @@ public class Chart extends AppCompatActivity {
         int indYr[]=null;
         ArrayList<Entry>[] entriesL=null;
         ArrayList<Entry>[] entriesR=null;
-
+        int indcMin=0;
+        int indcMax=0;
         if (ylHead.size()>0) {
             indYl = new int[ylHead.size()];
             entriesL = new ArrayList[ylHead.size()];
@@ -325,6 +293,7 @@ public class Chart extends AppCompatActivity {
                 entriesR[i]=new ArrayList<Entry>();
             }
         }
+        int indc=0;
         try {
             BufferedReader buf = new BufferedReader(
                     new InputStreamReader(
@@ -334,9 +303,12 @@ public class Chart extends AppCompatActivity {
                 line=buf.readLine();
                 if (line == null) continue;
                 String fields[]=patSemi.split(line);
-                if (skipTime[skipIndex]!=null){
-                    if (Float.parseFloat(fields[0])<skipTime[skipIndex]) continue;
+                if (rangeVal!=null && minRange!=null && maxRange!=null){
+                    Float toTest=Float.parseFloat(fields[rangeVal]);
+                    if (toTest<=minRange) indcMin=indc;
+                    else if (toTest<maxRange) indcMax=indc;
                 }
+                indc++;
                 Float X=Float.parseFloat(fields[indX]);
                 if (prevX==null) prevX=X;
                 else {
@@ -355,12 +327,12 @@ public class Chart extends AppCompatActivity {
         catch (Exception e){
             finish();
         }
-        if (!sortedX) Toast.makeText(context,"Unsorted X",Toast.LENGTH_LONG).show();
         XAxis xAxis = chart.getXAxis();
         YAxis ylAxis=chart.getAxisLeft();
         YAxis yrAxis=chart.getAxisRight();
         xAxis.setLabelRotationAngle(-45f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        Description des=new Description();
         if (sortedX) {
             LineDataSet dataSetL[]=null;
             LineDataSet dataSetR[]=null;
@@ -397,15 +369,27 @@ public class Chart extends AppCompatActivity {
             } else yrAxis.setEnabled(false);
             LineData lineData = new LineData(iLineDataSets);
             combData.setData(lineData);
+            rangeVal=indX;
+            minRange=null;
+            maxRange=null;
+            des.setText(m.getPlane()+" / "+m.getComment());
         } else {
+            Toast.makeText(context,"Unsorted X",Toast.LENGTH_LONG).show();
             ScatterDataSet dataSetL[]=null;
             ScatterDataSet dataSetR[]=null;
             ArrayList<IScatterDataSet> iScatterDataSets=new ArrayList<IScatterDataSet>();
+            if ((indcMax-indcMin)<1) rangeVal=null;
             if (ylHead.size()>0){
                 ylAxis.setEnabled(true);
                 dataSetL=new ScatterDataSet[ylHead.size()];
                 for (int i=0;i<ylHead.size();i++){
-                    dataSetL[i]=new ScatterDataSet(entriesL[i],ylHead.get(i)+"/"+xHead);
+                    if (rangeVal!=null && (indcMin>0 || indcMax<entriesL[i].size()-1)){
+                        List<Entry> entries=entriesL[i].subList(indcMin,indcMax);
+                        Collections.sort(entries,new EntryXComparator()); // chart bug
+                        dataSetL[i]=new ScatterDataSet(entries,ylHead.get(i)+"/"+xHead);
+                   } else {
+                        dataSetL[i] = new ScatterDataSet(entriesL[i], ylHead.get(i) + "/" + xHead);
+                    }
                     dataSetL[i].setScatterShape(ScatterChart.ScatterShape.SQUARE);
                     dataSetL[i].setColor(colors[i%colors.length]);
                     dataSetL[i].setScatterShapeSize(5.0f);
@@ -421,7 +405,13 @@ public class Chart extends AppCompatActivity {
                 yrAxis.setEnabled(true);
                 dataSetR=new ScatterDataSet[yrHead.size()];
                 for (int i=0;i<yrHead.size();i++){
-                    dataSetR[i]=new ScatterDataSet(entriesR[i],yrHead.get(i)+"/"+xHead);
+                    if (rangeVal!=null && (indcMin>0 || indcMax<entriesR[i].size()-1)){
+                        List<Entry> entries=entriesR[i].subList(indcMin,indcMax);
+                        Collections.sort(entries,new EntryXComparator()); // chart bug
+                        dataSetR[i]=new ScatterDataSet(entries,yrHead.get(i)+"/"+xHead);
+                   } else {
+                        dataSetR[i] = new ScatterDataSet(entriesR[i], yrHead.get(i) + "/" + xHead);
+                    }
                     dataSetR[i].setScatterShape(ScatterChart.ScatterShape.SQUARE);
                     dataSetR[i].setColor(colors[(colors.length-i-1)%colors.length]);
                     dataSetR[i].setScatterShapeSize(5.0f);
@@ -435,10 +425,18 @@ public class Chart extends AppCompatActivity {
             } else yrAxis.setEnabled(false);
             ScatterData scatterData=new ScatterData(iScatterDataSets);
             combData.setData(scatterData);
+            if (rangeVal==null || minRange==null || maxRange==null) {
+                des.setText(m.getPlane() + " / " + m.getComment());
+            }
+            else {
+                String ft=String.format(Locale.ENGLISH,"%s: %.1f to %.1f",
+                        fieldsHead[rangeVal],minRange,maxRange);
+                des.setText(ft+" / "+ m.getPlane()+" / "+m.getComment());
+            }
         }
         chart.setData(combData);
-        Description des=new Description();
-        des.setText(m.getPlane()+" / "+m.getComment());
+
+
         chart.setDescription(des);
         chart.invalidate();
 

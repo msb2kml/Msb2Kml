@@ -11,11 +11,13 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import org.js.msb2kml.Common.metaData;
 import org.js.msb2kml.DisplayLog.Browse;
 import org.js.msb2kml.DisplayLog.Chart;
+import org.js.msb2kml.DisplayLog.Vmeta;
 import org.js.msb2kml.DisplayLog.Vtrk;
 import org.js.msb2kml.R;
 import org.js.msb2kml.Common.listing;
@@ -159,13 +161,17 @@ public class Display extends AppCompatActivity {
             if (zz.contains("earth")) Earth=true;
         }
         if (vMenu.get(which).contentEquals(this.getString(R.string.vMeta))){
-            Intent nt=new Intent(this,Browse.class);
-            nt.putExtra("url","file://"+l.getTxt(selFile));
+            Intent nt=new Intent(this, Vmeta.class);
+            nt.putExtra("MsbName",l.getBase(selFile));
+            nt.putExtra("MSBlog",pathMSBlog);
+//            Intent nt=new Intent(this,Browse.class);
+//            nt.putExtra("url","file://"+l.getTxt(selFile));
             startActivity(nt);
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vHtml))) {
             Intent nt=new Intent(this,Browse.class);
             nt.putExtra("url","file://"+l.getHtml(selFile));
             startActivity(nt);
+
         } else if (vMenu.get(which).contentEquals(this.getString(R.string.vChart))) {
             Intent nt=new Intent(this,Chart.class);
             nt.putExtra("MsbName",l.getBase(selFile));

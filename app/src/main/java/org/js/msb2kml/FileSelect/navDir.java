@@ -16,9 +16,15 @@ import java.util.regex.PatternSyntaxException;
 public class navDir {
 
     String exPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+    String rmvPath=null;
     private String curDir=exPath;
     private Pattern patrn=null;
     private Boolean noDir=true;
+
+    public navDir(String exP, String rmvP){
+        exPath=exP;
+        rmvPath=rmvP;
+    }
 
 
     public void setCurDir(String dir){
@@ -30,15 +36,17 @@ public class navDir {
     }
 
     public String upDir(){
-        File dir=new File(curDir);
-        curDir=dir.getParent();
+        File dir = new File(curDir);
+        curDir = dir.getParent();
+//            if (curDir == null) curDir = exPath;
+//        }
         return curDir;
     }
 
     public String dnDir(String down){
-        if (!curDir.equals("/")) {
+        if (!curDir.equals("/") && !down.startsWith("/")) {
             curDir+="/";
-        }
+        } else curDir="";
         if (down.endsWith("/")){
             curDir+=down.substring(0,down.length()-1);
         } else curDir+=down;
@@ -64,10 +72,20 @@ public class navDir {
     }
 
     public String[] get(){
+        if (curDir==null) curDir="/";
         File dir=new File(curDir);
         if (curDir.equals("/") || !dir.exists() || !dir.isDirectory()) {
-            curDir=exPath;
-            dir=new File(curDir);
+            if (rmvPath!=null){
+                ArrayList<String> directories=new ArrayList<>();
+                directories.add("../ (up)");
+                directories.add(rmvPath+"/");
+                directories.add(exPath+"/");
+                String[] ar=directories.toArray(new String[0]);
+                return ar;
+            } else {
+                curDir = exPath;
+                dir = new File(curDir);
+            }
         }
         ArrayList <String> directories=new ArrayList<String>();
         ArrayList <String> files=new ArrayList<String>();

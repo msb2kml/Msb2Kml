@@ -396,7 +396,7 @@ public class fileProcess {
             }
             else{
                 for (int i=0;i<Head.size();i++){
-                    if (Head.get(i).matches("-")) continue;
+                    if (i>0 && Head.get(i).matches("-")) continue;
                     outTXT.write(String.format(Locale.US,"%s: %g ;%g\n",
                             Head.get(i),minData.get(i),maxData.get(i)));
                 }

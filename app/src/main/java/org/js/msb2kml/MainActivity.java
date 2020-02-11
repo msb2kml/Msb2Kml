@@ -77,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
             exPath+".",Toast.LENGTH_LONG).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
-        }
-        checkDir();
+        } else checkDir();
     }
 
     @Override

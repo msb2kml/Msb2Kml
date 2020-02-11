@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".DisplayLog.Vmeta"></activity>
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="stateHidden">
@@ -34,7 +35,7 @@
         </activity>
         <activity
             android:name=".DisplayLog.Browse"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ProcessLog.Process"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -66,10 +67,9 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".DisplayLog.Vtrk"
-            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"
-            android:configChanges="orientation|screenSize">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
     </application>
 
 </manifest>

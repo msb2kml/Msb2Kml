@@ -14,10 +14,10 @@ This application makes a separation between these two kinds of data.
 
 However, the Flight Recorder could be used on the ground, connected
 to the COM port of a 
-[Souffleur](https://www.multiplex-rc.de/produkte/45185-souffleur-deutsch)
-or of an HF module for a transmitter. The log files could contain the
-data transmitted through the telemetry from the GPS module, including the
-position of the plane relative to the pilot.
+[Souffleur](https://www.multiplex-rc.de/Downloads/Multiplex/Bedienungsanleitungen/45185-bedienungsanleitung-souffleur--de-en-fr-it-es.pdf)
+or of an HF module for a transmitter. In this case the log files could
+contain the data transmitted through the telemetry from the GPS module,
+not the absolute position but the position of the plane relative to the pilot.
 The Msb2Kml application is able to reconstruct the geographic coordinates of
 the flight track from this data if the location of the pilot is provided.
 Log files produced by the sibling application Msb2And could also
@@ -31,7 +31,7 @@ the applications needed to analyze them.
 It acts as a bridge between the MSB format and the KML
 format used by Google Earth: thus the name "MSB to KML".
 
-This is a standard Android/Java application that request only the permission
+This is a standard Android/Java application that need only the permission
 to read and write files and also to obtain the geographic position
 from the GPS sensor. You could have to check in the settings
 of the device that the installation of applications from other
@@ -39,14 +39,15 @@ sources than Google Play is permitted.
 
 It should work on Android versions from Jelly Bean (4.1) to Oreo (8.0).
 
-# Installation
+## Installation
 The application could be compiled with AndroidStudio from the files
 downloaded from this repository.
 
 Alternatively it could be obtained with the documentation from
-the "Releases" pages from the repository.
+the ["Releases"](https://github.com/msb2kml/Msb2Kml/releases)
+pages from the repository.
 
-In each case the application package (such as Msb2Kml56.apk) should be
+In each case the application package (such as Msb2Kml57.apk) should be
 transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.
@@ -62,7 +63,7 @@ To look at GPS track in KML files: [Google Earth](https://play.google.com/store/
 
 To edit the configuration file: [DroidEdit](https://play.google.com/store/apps/details?id=com.aor.droidedit) from Google Play.
 
-# Screenshots
+## Screenshots
 
 Vario, smoothed vario and height:
 

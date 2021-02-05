@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -26,8 +25,10 @@ import android.widget.Toast;
 
 import org.js.msb2kml.Common.listing;
 import org.js.msb2kml.Common.metaData;
+import org.js.msb2kml.FileSelect.Selector;
 import org.js.msb2kml.R;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Vtrk extends AppCompatActivity {
     Track track=null;
     Csv csv=null;
     TextView tTitle;
-    CheckBox ckSG;
+    Button bRef;
     Button bcolBy;
     EditText etBlue;
     EditText etRed;
@@ -76,25 +77,32 @@ public class Vtrk extends AppCompatActivity {
                           Color.rgb(0xFF,0x78,0x00),
                           Color.rgb(0xFF,0x00,0x00)};
     int nColor=lineColor.length;
+    int HalfMagenta=Color.argb(0x80,0xFF,0x00,0xFF);
 
     String gpxPath;
     String csvPath;
+    String pathStartGps;
+    String refPath =null;
+    String refDirectory =null;
     Intent intentMap=null;
     Double zoom=17.0;
-    Boolean wthStart=false;
     Long size;
     boolean running=false;
-    Long lastDis=null;
     Long lastTrk=null;
     Long divisor=1L;
     Long toSkip=0L;
     Long startTime=null;
     Calendar startCal=null;
     Boolean runningMap=false;
+    Boolean waitMap=false;
     Boolean setStart=true;
     Location startLoc=null;
     Double prevAlt=null;
     Location dispLoc=null;
+    Boolean inRef =false;
+    Track.enttGpx curEntity= Track.enttGpx.ALIEN;
+    String curEntName=null;
+    String fileName=null;
     Boolean Tail=true;
     Double minVal=null;
     Double maxVal=null;
@@ -107,11 +115,21 @@ public class Vtrk extends AppCompatActivity {
     ArrayList<String> colMax=new ArrayList<>();
     String patrnExtrm="^([^:]+):{1}([^;]+);{1}([^;]+)$";
     IntentFilter filter=new IntentFilter("org.js.ACK");
+
+    class SaveGpx {
+        Track track=null;
+        Location dispLoc=null;
+        Location startLoc=null;
+        Track.enttGpx curEntity=null;
+        String curEntName=null;
+    }
+    SaveGpx saved=null;
+
     private Handler mHandler=new Handler();
     private Runnable timerTask=new Runnable() {
         @Override
         public void run() {
-            Vnext();
+            dispatch(2);
         }
     };
 
@@ -139,6 +157,7 @@ public class Vtrk extends AppCompatActivity {
         Intent intent=getIntent();
         MsbName=intent.getStringExtra("MsbName");
         pathMSBlog=intent.getStringExtra("MSBlog");
+        refDirectory =pathMSBlog;
         m=new metaData(pathMSBlog);
         if (MsbName == null) finish();
         l=new listing();
@@ -149,8 +168,9 @@ public class Vtrk extends AppCompatActivity {
         gpxPath=m.getPathGpx();
         csvPath=l.getCsv(0);
         startCal=m.getStartTime();
+        pathStartGps=m.getPathStartGPS();
         tTitle=(TextView) findViewById(R.id.title_vt);
-        ckSG=(CheckBox) findViewById(R.id.ckSG_vt);
+        bRef =(Button) findViewById(R.id.bRef);
         bcolBy=(Button) findViewById(R.id.colBy_vt);
         etBlue=(EditText) findViewById(R.id.blueVal_vt);
         Integer signNum=InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|
@@ -204,17 +224,39 @@ public class Vtrk extends AppCompatActivity {
                 finish();
             }
         });
+//        if (refPath ==null) refPath =pathStartGps;
+        if (refPath ==null) bRef.setText("-none-");
+        else {
+            String bGname = (new File(refPath).getName());
+            bRef.setText(bGname);
+        }
+        bRef.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectRef();
+            }
+        });
+
         bEntire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                entireTrack();
+                if (!settings()) return;
+                Tail=false;
+                if (track!=null){
+                    track.close();
+                    track=null;
+                }
+                running=true;
+                dispatch(0);
             }
         });
         bSkp0.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                running=true;
+                if (!settings()) return;
                 getSpeed();
+                Tail=true;
+                running=true;
                 toSkip=0L;
                 mHandler.postDelayed(timerTask,300L);
             }
@@ -222,8 +264,10 @@ public class Vtrk extends AppCompatActivity {
         bSkp2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                running=true;
+                if (!settings()) return;
                 getSpeed();
+                Tail=true;
+                running=true;
                 toSkip=120000L;
                 mHandler.postDelayed(timerTask,300L);
             }
@@ -231,8 +275,10 @@ public class Vtrk extends AppCompatActivity {
         bSkp10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                running=true;
+                if (!settings()) return;
                 getSpeed();
+                Tail=true;
+                running=true;
                 toSkip=600000L;
                 mHandler.postDelayed(timerTask,300L);
             }
@@ -244,6 +290,36 @@ public class Vtrk extends AppCompatActivity {
 
         super.onResume();
         fromMap();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch (requestCode){
+            case 2:
+                if (resultCode==RESULT_OK){
+                    refPath =data.getStringExtra("Path");
+                    if (refPath ==null || refPath.isEmpty()) refPath =null;
+                } else refPath =null;
+                if (refPath ==null) bRef.setText("-none-");
+                else {
+                    File f=new File(refPath);
+                    String bGname = f.getName();
+                    refDirectory=f.getParent();
+                    bRef.setText(bGname);
+                }
+                break;
+        }
+    }
+
+    void selectRef(){
+        Intent intent=new Intent(Vtrk.this, Selector.class);
+        if (refDirectory !=null) intent.putExtra("CurrentDir", refDirectory);
+        intent.putExtra("WithDir",false);
+        intent.putExtra("Mask","(?i).+\\.gpx");
+        intent.putExtra("Title","Reference GPX?      ");
+        if (refPath !=null) intent.putExtra("Previous", refPath);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(intent,2);
     }
 
     void selectCol(){
@@ -281,23 +357,66 @@ public class Vtrk extends AppCompatActivity {
         }
     }
 
+    Boolean settings(){
+        if (srcCol!=null){
+            if (!getValCol()){
+                Toast.makeText(context,"Please check the Blue and Red values.",
+                        Toast.LENGTH_LONG).show();
+                return false;
+            }
+            if (csv!=null) csv.close();
+            csv=new Csv();
+            Integer nFields=csv.open(csvPath,startCal);
+            if (nFields==null || srcCol>=nFields){
+                Toast.makeText(context,"CSV file not available.",
+                        Toast.LENGTH_LONG).show();
+                csv.close();
+                csv=null;
+            }
+        } else {
+            if (csv!=null) csv.close();
+            csv=null;
+        }
+        return true;
+    }
+
+    Location initTrack(){
+        Location firstLoc=null;
+        if (track!=null) track.close();
+        track=new Track();
+        size=track.open(gpxPath);
+        firstLoc=readTrk();
+        if (firstLoc==null){
+            Toast.makeText(context,"No valid item in "+gpxPath,Toast.LENGTH_LONG).show();
+        }
+        minVal=null;
+        maxVal=null;
+        setStart=true;
+        return firstLoc;
+    }
+
     public Location readTrk(){
         Location loc=null;
         Long position;
+        Track.enttGpx entity=null;
+        String name;
+        String entName;
         if (track==null) return null;
-        loc=track.nextPt();
-        if (loc==null) return loc;
-        position = track.getPos();
-        Float prog = (100.0f * Float.valueOf(position)) / Float.valueOf(size);
-        pBar.setProgress(prog.intValue());
-        if (startTime!=null) {
-            Long sec = (loc.getTime() - startTime) / 1000L;
-            Long hour=sec/3600L;
-            Long min=(sec-hour*3600L)/60L;
-            Long s=(sec-hour*3600L-min*60L);
-            tTime.setText(String.format("%02d:%02d:%02d",hour,min,s));
+        while (true) {
+            loc = track.nextPt();
+            if (loc == null) return loc;
+            position = track.getPos();
+            Float prog = (100.0f * Float.valueOf(position)) / Float.valueOf(size);
+            pBar.setProgress(prog.intValue());
+            if (startTime != null && startTime>0L && loc.getTime() != 0L) {
+                Long sec = (loc.getTime() - startTime) / 1000L;
+                Long hour = sec / 3600L;
+                Long min = (sec - hour * 3600L) / 60L;
+                Long s = (sec - hour * 3600L - min * 60L);
+                tTime.setText(String.format("%02d:%02d:%02d", hour, min, s));
+            } else tTime.setText("0");
+            return loc;
         }
-        return loc;
     }
 
     public void getSpeed(){
@@ -349,148 +468,19 @@ public class Vtrk extends AppCompatActivity {
 
     public Location skip(Location currentLoc){
         Location loc;
-        if (toSkip==0l) return currentLoc;
+        if (toSkip==0l || currentLoc.getTime()==0L) return currentLoc;
         loc=currentLoc;
         Long target=currentLoc.getTime()+toSkip;
-        toSkip=0L;
         while (loc.getTime()<target){
             loc=readTrk();
-            if (loc==null) return loc;
+            if (loc==null ||
+            loc.getExtras().getSerializable("ENTITY")!=Track.enttGpx.TRKWPT){
+                toSkip=0L;
+                return loc;
+            }
         }
+        toSkip=0L;
         return loc;
-    }
-
-    public void Vnext(){
-        String bubbleMap;
-        if (!Tail){
-            fillTrack();
-            return;
-        }
-        if (!running) return;
-        Long now=System.currentTimeMillis();
-        if (track==null){
-
-            track=new Track();
-            size=track.open(gpxPath);
-            dispLoc=readTrk();
-            if (dispLoc==null){
-                eof();
-                finish();
-                return;
-            } else {
-                startLoc = dispLoc;
-                startTime = startLoc.getTime();
-                prevAlt = null;
-                if (csv==null) {
-                    minVal = dispLoc.getAltitude();
-                    maxVal = minVal;
-                } else {
-                   Float val=csv.nextPt(startTime,srcCol);
-                   if (val!=null) {
-                       minVal = val.doubleValue();
-                       maxVal = minVal;
-                   }
-                }
-            }
-        }
-        if (srcCol!=null){
-            if (!getValCol()){
-                Toast.makeText(context,"Please check the Blue and Red values.",
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (csv!=null) csv.close();
-            csv=new Csv();
-            Integer nFields=csv.open(csvPath,startCal);
-            if (nFields==null || srcCol>=nFields){
-                Toast.makeText(context,"CSV file not available.",
-                        Toast.LENGTH_LONG).show();
-                csv.close();
-                csv=null;
-            }
-        } else {
-            if (csv!=null) csv.close();
-            csv=null;
-        }
-        if (!runningMap){
-            Intent nt=(Intent) intentMap.clone();
-            nt.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-            nt.putExtra("CALLER",context.getString(R.string.app_name));
-            wthStart=ckSG.isChecked();
-            setStart=!wthStart;
-            nt.putExtra("CENTER",startLoc);
-            nt.putExtra("StartGPS",wthStart);
-            nt.putExtra("Tail",Tail);
-            if (zoom!=null) nt.putExtra("ZOOM",zoom);
-            runningMap=true;
-            zoom=null;
-            startActivity(nt);
-            if (toSkip>0){
-                dispLoc=skip(dispLoc);
-                if (dispLoc==null){
-                    eof();
-                    return;
-                }
-                prevAlt=null;
-            }
-            registerReceiver(mReceiver,filter);
-            return;
-        }
-        Double alt=dispLoc.getAltitude();
-        Intent nt=new Intent();
-        nt.setAction("org.js.LOC");
-        nt.putExtra("LOC",dispLoc);
-        if (csv!=null){
-            Long sometime=dispLoc.getTime();
-            Float val=csv.nextPt(sometime,srcCol);
-            if (val!=null) {
-                if (minVal==null){
-                    minVal=val.doubleValue();
-                    maxVal=minVal;
-                } else {
-                    minVal = Math.min(minVal, val.doubleValue());
-                    maxVal = Math.max(maxVal, val.doubleValue());
-                }
-                Integer col = colorz(val);
-                nt.putExtra("COLOR", col);
-                bubbleMap = String.format(Locale.ENGLISH, "%s %.1f",
-                        colHead.get(srcCol + 1), val);
-            } else {
-                bubbleMap=" - ";
-            }
-        } else {
-            minVal=Math.min(minVal,alt);
-            maxVal=Math.max(maxVal,alt);
-            bubbleMap=String.format(Locale.ENGLISH,"Alt %.1f",alt);
-            if (prevAlt == null || alt > prevAlt) {
-                nt.putExtra("COLOR", Color.rgb(0xFF, 0x00, 0x00));
-            } else {
-                nt.putExtra("COLOR", Color.rgb(0x00, 0x00, 0xFF));
-            }
-        }
-        nt.putExtra("BUBBLE",bubbleMap);
-        prevAlt=alt;
-        sendBroadcast(nt);
-        if (setStart){
-            nt=new Intent();
-            nt.setAction("org.js.LOC");
-            nt.putExtra("WPT",startLoc);
-            nt.putExtra("WPT_NAME",MsbName);
-            sendBroadcast(nt);
-            setStart=false;
-        }
-        lastDis=now;
-        lastTrk=dispLoc.getTime();
-        Long toWait=0L;
-        while (toWait<300L){
-            dispLoc=readTrk();
-            if (dispLoc==null){
-                eof();
-                return;
-            }
-            toWait=(dispLoc.getTime()-lastTrk)/divisor;
-        }
-        mHandler.postDelayed(timerTask,toWait);
     }
 
 
@@ -498,155 +488,433 @@ public class Vtrk extends AppCompatActivity {
         if (runningMap) {
             running = false;
             runningMap = false;
-//            Toast.makeText(context, "Return from map", Toast.LENGTH_LONG).show();
         }
     }
 
     void eof(){
-        track.close();
-        running=false;
-        Toast.makeText(context,"END OF FILE",Toast.LENGTH_LONG).show();
-        bSkp0.setEnabled(false);
-        bSkp2.setEnabled(false);
-        bSkp10.setEnabled(false);
-        track=null;
-        if (csv!=null) {
-            csv.close();
-            csv = null;
+        if (inRef && saved!=null){
+            track.close();
+            track=saved.track;
+            dispLoc=saved.dispLoc;
+            curEntity=saved.curEntity;
+            startLoc=saved.startLoc;
+            curEntName=saved.curEntName;
+            saved=null;
+            inRef =false;
+            setStart=true;
+            dispatch(5);
+        } else {
+            track.close();
+            running = false;
+            Toast.makeText(context, "END OF FILE", Toast.LENGTH_LONG).show();
+            track = null;
+            if (csv != null) {
+                csv.close();
+                csv = null;
+            }
         }
     }
 
-    void entireTrack(){
-        if (srcCol!=null){
-            if (!getValCol()){
-                Toast.makeText(context,"Please check the Blue and Red values.",
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (csv!=null) csv.close();
-            csv=new Csv();
-            Integer nFields=csv.open(csvPath,startCal);
-            if (nFields==null || srcCol>=nFields){
-                Toast.makeText(context,"CSV file not available.",
-                        Toast.LENGTH_LONG).show();
-                csv.close();
-                csv=null;
-            }
-        } else {
-            if (csv!=null) csv.close();
-            csv=null;
-        }
-        if (track!=null) track.close();
-        track=new Track();
-        size=track.open(gpxPath);
-        dispLoc=readTrk();
-        if (dispLoc==null){
-            eof();
-            bEntire.setEnabled(false);
-            finish();
-            return;
-        } else {
-            startLoc = dispLoc;
-            startTime = startLoc.getTime();
-            prevAlt = null;
-            if (csv==null) {
-                minVal = dispLoc.getAltitude();
-                maxVal = minVal;
-            } else {
-                Float val=csv.nextPt(startTime,srcCol);
-                if (val!=null) {
-                    minVal = val.doubleValue();
-                    maxVal = minVal;
-                }
-            }
-        }
-        Tail=false;
+    void launchMap(Location centerLoc){
         Intent nt=(Intent) intentMap.clone();
         nt.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         nt.putExtra("CALLER",context.getString(R.string.app_name));
-        nt.putExtra("CENTER",startLoc);
-        wthStart=ckSG.isChecked();
-        setStart=!wthStart;
-        nt.putExtra("StartGPS",wthStart);
+        nt.putExtra("CENTER",centerLoc);
+        nt.putExtra("StartGPS",false);
         nt.putExtra("Tail",Tail);
         if (zoom!=null) nt.putExtra("ZOOM",zoom);
-        runningMap=true;
         zoom=null;
+        runningMap=true;
         startActivity(nt);
+        waitMap=true;
         registerReceiver(mReceiver,filter);
-    }
-
-    void fillTrack(){
-        Intent nt;
-        String bubbleMap;
-
-        while (dispLoc!=null) {
-            dispLoc = readTrk();
-            if (dispLoc == null) {
-                if (setStart){
-                    nt=new Intent();
-                    nt.setAction("org.js.LOC");
-                    nt.putExtra("WPT",startLoc);
-                    nt.putExtra("WPT_NAME",MsbName);
-                    sendBroadcast(nt);
-                    setStart=false;
-                }
-                eof();
-                bSkp0.setEnabled(true);
-                bSkp2.setEnabled(true);
-                bSkp10.setEnabled(true);
-                Tail=true;
-                return;
-            }
-            Double alt = dispLoc.getAltitude();
-            nt = new Intent();
-            nt.setAction("org.js.LOC");
-            nt.putExtra("LOC", dispLoc);
-            if (csv!=null){
-                Long sometime=dispLoc.getTime();
-                Float val=csv.nextPt(sometime,srcCol);
-                if (val==null){
-                    nt.putExtra("COLOR",Color.BLACK);
-                    bubbleMap=" - ";
-                } else {
-                    if (minVal==null) {
-                        minVal=val.doubleValue();
-                        maxVal=minVal;
-                    } else {
-                        minVal = Math.min(minVal, val.doubleValue());
-                        maxVal = Math.max(maxVal, val.doubleValue());
-                    }
-                    Integer col = colorz(val);
-                    nt.putExtra("COLOR", col);
-                    bubbleMap=String.format(Locale.ENGLISH,"%s %.1f to %.1f",
-                            colHead.get(srcCol+1),minVal,maxVal);
-                }
-            } else {
-                minVal=Math.min(minVal,alt);
-                maxVal=Math.max(maxVal,alt);
-                bubbleMap=String.format(Locale.ENGLISH,"Alt %.1f to %.1f",minVal,maxVal);
-                if (prevAlt == null || alt > prevAlt) {
-                    nt.putExtra("COLOR", Color.rgb(0xFF, 0x00, 0x00));
-                } else {
-                    nt.putExtra("COLOR", Color.rgb(0x00, 0x00, 0xFF));
-                }
-            }
-            nt.putExtra("BUBBLE", bubbleMap);
-            prevAlt = alt;
-            sendBroadcast(nt);
-        }
+        setStart=true;
+        minVal=null;
+        maxVal=null;
+        return;
     }
 
     private final BroadcastReceiver mReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (!waitMap) return;
             String origin=intent.getStringExtra("NAME");
+            int vc=intent.getIntExtra("VERSION",0);
             unregisterReceiver(mReceiver);
-            Vnext();
+            ckVcMap(vc);
+            waitMap=false;
+            if (refPath ==null) {
+                dispatch(2);
+            } else {
+                setRef();
+            }
         }
     };
 
+    void ckVcMap(int vc){
+        if (vc<16){
+            Toast.makeText(context,"Msb2Map revision should be at least 1.6",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
 
+    void setRef(){
+        Location firstLoc=null;
+        Long sizeRef=null;
+        saved=new SaveGpx();
+        saved.track=track;
+        saved.dispLoc=dispLoc;
+        saved.curEntity=curEntity;
+        saved.startLoc=startLoc;
+        saved.curEntName=curEntName;
+        track=new Track();
+        sizeRef=track.open(refPath);
+        firstLoc=readTrk();
+        if (firstLoc==null){
+            Toast.makeText(context,"No valid item in "+ refPath,Toast.LENGTH_LONG).show();
+            track.close();
+            track=saved.track;
+            dispLoc=saved.dispLoc;
+            curEntity=saved.curEntity;
+            startLoc=saved.startLoc;
+            curEntName=saved.curEntName;
+            saved=null;
+            inRef =false;
+            setStart=true;
+            dispatch(5);
+        } else {
+            dispLoc=firstLoc;
+            inRef =true;
+            dispatch(6);
+        }
+    }
+
+    void dispatch(int from){
+        if (!running) return;
+        if (track==null){
+            dispLoc=initTrack();
+            if (dispLoc==null){
+                eof();
+                return;
+            }
+        }
+        while (dispLoc!=null){
+            Track.enttGpx entity=(Track.enttGpx) dispLoc.getExtras().getSerializable("ENTITY");
+            if (!inRef && Tail && (entity==Track.enttGpx.TRK || entity==Track.enttGpx.TRKWPT)){
+                if (withTail()) return;
+            } else {
+                if (noTail()) return;
+            }
+        }
+        eof();
+    }
+
+    Boolean noTail(){
+        if (dispLoc==null) return true;
+        Float val=null;
+        int nbBroadcast=0;
+        int typ=0;
+        Track.enttGpx entity=(Track.enttGpx)dispLoc.getExtras().getSerializable("ENTITY");
+        switch (entity){
+            case WPT:
+                curEntity=entity;
+            case RTEWPT:
+            case TRKWPT:
+                if (!runningMap) {
+                    launchMap(dispLoc);
+                    return true;
+                }
+                break;
+            case TRK:
+                curEntName="Track "+dispLoc.getExtras().getString("name",null);
+                setStart=true;
+                startLoc=null;
+                minVal=null;
+                maxVal=null;
+                curEntity=entity;
+                dispLoc=readTrk();
+                return false;
+            case RTE:
+                curEntName="Route "+dispLoc.getExtras().getString("name",null);
+                setStart=true;
+                startLoc=null;
+                minVal=null;
+                maxVal=null;
+                curEntity=entity;
+                dispLoc=readTrk();
+                return false;
+            case ALIEN:
+                track.close();
+                Toast.makeText(context,"Sorry, "+fileName+" is not compatible.",
+                        Toast.LENGTH_LONG).show();
+                eof();
+                return true;
+        }
+        while (true){
+            nbBroadcast++;
+            if (nbBroadcast>100){
+                mHandler.postDelayed(timerTask,100L);
+                return true;
+            }
+            entity=(Track.enttGpx) dispLoc.getExtras().getSerializable("ENTITY");
+            switch (curEntity){
+                case WPT:
+                    if (entity!=curEntity) return false;
+                    if (inRef) typ=2;
+                    else typ=0;
+                    dispWpt(dispLoc, null,typ);
+                    break;
+                case TRKWPT:
+                case RTEWPT:
+                    if (entity!=curEntity) {
+                        return false;
+                    }
+                    int color=Color.BLACK;
+                    val=null;
+                    String bubble=" - ";
+                    if (inRef) color= HalfMagenta;
+                    else {
+                        if (csv != null) {
+                            val = csv.nextPt(dispLoc.getTime(), srcCol);
+                            if (val != null) {
+                                color = colorz(val);
+                                if (minVal == null) {
+                                    minVal = val.doubleValue();
+                                    maxVal = minVal;
+                                } else {
+                                    minVal = Math.min(minVal, val.doubleValue());
+                                    maxVal = Math.max(maxVal, val.doubleValue());
+                                }
+                                bubble = String.format(Locale.ENGLISH, "%s %.1f to %.1f",
+                                        colHead.get(srcCol + 1), minVal, maxVal);
+                            }
+                        } else {
+                            Double alt = dispLoc.getAltitude();
+                            if (prevAlt != null) {
+                                if (alt > prevAlt) color = Color.RED;
+                                else color = Color.BLUE;
+                            }
+                            prevAlt = alt;
+                            if (minVal == null) {
+                                minVal = alt;
+                                maxVal = alt;
+                            } else {
+                                minVal = Math.min(minVal, alt);
+                                maxVal = Math.max(maxVal, alt);
+                            }
+                            bubble = String.format(Locale.ENGLISH, "Alt. %.1f to %.1f",
+                                    minVal, maxVal);
+                        }
+                    }
+                    dispTrk(dispLoc,bubble,color,false,Tail);
+                    break;
+                case RTE:
+                    if (entity!= Track.enttGpx.RTEWPT) return false;
+                    if (setStart) {
+                        if (startLoc == null) {
+                            startLoc = dispLoc;
+                            startLoc.getExtras().putString("name", curEntName);
+                            if (!inRef) startTime = startLoc.getTime();
+                            prevAlt = null;
+                            if (!inRef) {
+                                if (csv == null) {
+                                    minVal = dispLoc.getAltitude();
+                                    maxVal = minVal;
+                                } else {
+                                    val = csv.nextPt(startTime, srcCol);
+                                    if (val != null) {
+                                        minVal = val.doubleValue();
+                                        maxVal = minVal;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    dispTrk(dispLoc,curEntName,Color.BLACK,true,false);
+                    if (setStart){
+                        dispWpt(startLoc, curEntName,1);
+                        setStart=false;
+                    }
+                    curEntity=entity;
+                    break;
+                case TRK:
+                    if (entity!= Track.enttGpx.TRKWPT) return false;
+                    if (setStart) {
+                        if (startLoc == null) {
+                            startLoc = dispLoc;
+                            startLoc.getExtras().putString("name", curEntName);
+                            if (!inRef) startTime = startLoc.getTime();
+                            prevAlt = null;
+                            if (!inRef) {
+                                if (csv == null) {
+                                    minVal = dispLoc.getAltitude();
+                                    maxVal = minVal;
+                                } else {
+                                    val = csv.nextPt(startTime, srcCol);
+                                    if (val != null) {
+                                        minVal = val.doubleValue();
+                                        maxVal = minVal;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    dispTrk(dispLoc,curEntName,Color.BLACK,true,false);
+                    if (setStart){
+                        dispWpt(startLoc, curEntName,1);
+                        setStart=false;
+                    }
+                    curEntity=entity;
+                    break;
+
+            }
+            if (!runningMap) return true;
+            dispLoc=readTrk();
+            if (dispLoc==null) {
+                return false;
+            }
+        }
+    }
+
+    Boolean withTail() {
+        if (dispLoc == null) return true;
+        Long now=System.currentTimeMillis();
+        Float val = null;
+        Track.enttGpx entity=(Track.enttGpx)dispLoc.getExtras().getSerializable("ENTITY");
+        switch (entity){
+            case TRKWPT:
+                if (setStart) {
+                    if (startLoc == null) {
+                        if (dispLoc.getTime()==0L || !dispLoc.hasAltitude()){
+                            Tail=false;
+                            return false;
+                        }
+                        startLoc = dispLoc;
+                        startLoc.getExtras().putString("name", curEntName);
+                        startTime = startLoc.getTime();
+                        prevAlt = null;
+                        if (csv == null) {
+                            minVal = dispLoc.getAltitude();
+                            maxVal = minVal;
+                        } else {
+                            val = csv.nextPt(startTime, srcCol);
+                            if (val != null) {
+                                minVal = val.doubleValue();
+                                maxVal = minVal;
+                            }
+                        }
+                    }
+                }
+                if (toSkip>0L){
+                    dispLoc=skip(dispLoc);
+                    if (dispLoc==null) return false;
+                    entity=(Track.enttGpx) dispLoc.getExtras().getSerializable("ENTITY");
+                    if (entity!= Track.enttGpx.TRKWPT) return false;
+                }
+                if (!runningMap) {
+                    launchMap(dispLoc);
+                    return true;
+                }
+                break;
+            case TRK:
+                curEntName="Track "+dispLoc.getExtras().getString("name",null);
+                setStart=true;
+                startLoc=null;
+                minVal=null;
+                maxVal=null;
+                curEntity=entity;
+                dispLoc=readTrk();
+                return false;
+            default:
+                return false;
+        }
+//        entity=(Track.enttGpx) dispLoc.getExtras().getSerializable("ENTITY");
+        if (entity!= Track.enttGpx.TRKWPT) return false;
+        int color=Color.BLACK;
+
+        val=null;
+        String bubble=" - ";
+        if (csv!=null) {
+            val=csv.nextPt(dispLoc.getTime(),srcCol);
+            if (val!=null) {
+                color=colorz(val);
+                if (minVal == null) {
+                    minVal = val.doubleValue();
+                    maxVal = minVal;
+                } else {
+                    minVal = Math.min(minVal, val.doubleValue());
+                    maxVal = Math.max(maxVal, val.doubleValue());
+                }
+                bubble=String.format(Locale.ENGLISH,"%s %.1f to %.1f",
+                                    colHead.get(srcCol+1),minVal,maxVal);
+            }
+        } else {
+            Double alt=dispLoc.getAltitude();
+            if (prevAlt!=null){
+                if (alt>prevAlt) color=Color.RED;
+                else color=Color.BLUE;
+            }
+            prevAlt=alt;
+            if (minVal==null){
+                minVal=alt;
+                maxVal=alt;
+            } else {
+                minVal=Math.min(minVal,alt);
+                maxVal=Math.max(maxVal,alt);
+            }
+            bubble=String.format(Locale.ENGLISH,"Alt. %.1f to %.1f",
+                                    minVal,maxVal);
+        }
+        dispTrk(dispLoc,bubble,color,setStart,true);
+        if (setStart){
+            dispWpt(startLoc,curEntName,1);
+            setStart=false;
+        }
+        curEntity=entity;
+        lastTrk=dispLoc.getTime();
+        Long toWait=0L;
+        while (toWait<300L){
+            dispLoc=readTrk();
+            if (dispLoc==null) return false;
+            entity=(Track.enttGpx) dispLoc.getExtras().getSerializable("ENTITY");
+            if (entity!= Track.enttGpx.TRKWPT) return false;
+            if (dispLoc.getTime()>0L) toWait=(dispLoc.getTime()-lastTrk)/divisor;
+        }
+        mHandler.postDelayed(timerTask,toWait);
+        return true;
+    }
+
+    void dispWpt(Location loc, String infoBubble,int typ){
+        Intent nt = new Intent();
+        nt.setAction("org.js.LOC");
+        nt.putExtra("WPT",loc);
+        String namWpt=loc.getExtras().getString("name", "?");
+        if (infoBubble==null) {
+            if (loc.hasAltitude()) {
+                namWpt = String.format(Locale.ENGLISH, "%s (%.1f)",
+                        loc.getExtras().getString("name", "?"), loc.getAltitude());
+            }
+            nt.putExtra("BUBBLE",namWpt);
+        } else {
+            nt.putExtra("BUBBLE",infoBubble);
+        }
+        nt.putExtra("WPT_NAME", namWpt);
+        nt.putExtra("TYPE",typ);
+        sendBroadcast(nt);
+    }
+
+    void dispTrk(Location loc, String bubbleMap, int color, Boolean startLine, Boolean actTail){
+        Intent nt=new Intent();
+        nt.setAction("org.js.LOC");
+        nt.putExtra("LOC",loc);
+        nt.putExtra("COLOR",color);
+        nt.putExtra("BUBBLE",bubbleMap);
+        if (startLine){
+            nt.putExtra("START",startLine);
+            nt.putExtra("Tail",actTail);
+        }
+        sendBroadcast(nt);
+    }
 
 
 }

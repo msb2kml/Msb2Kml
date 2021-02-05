@@ -1,5 +1,6 @@
 package org.js.msb2kml.FileSelect;
 
+import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
@@ -19,13 +20,13 @@ public class navDir {
     String rmvPath=null;
     private String curDir=exPath;
     private Pattern patrn=null;
-    private Boolean noDir=true;
+    private Boolean writeable=false;
+    Boolean wthSaf=(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT);
 
     public navDir(String exP, String rmvP){
         exPath=exP;
         rmvPath=rmvP;
     }
-
 
     public void setCurDir(String dir){
         curDir=dir;
@@ -35,11 +36,17 @@ public class navDir {
         return curDir;
     }
 
+    public Boolean getWriteable() {
+        return writeable;
+    }
+
     public String upDir(){
-        File dir = new File(curDir);
-        curDir = dir.getParent();
-//            if (curDir == null) curDir = exPath;
-//        }
+        if (curDir.contentEquals(exPath) || (rmvPath!=null && curDir.contentEquals(rmvPath))){
+            curDir="/";
+        } else {
+            File dir = new File(curDir);
+            curDir = dir.getParent();
+        }
         return curDir;
     }
 
@@ -67,10 +74,6 @@ public class navDir {
         }
     }
 
-    public void setNoDir(Boolean n){
-        noDir=n;
-    }
-
     public String[] get(){
         if (curDir==null) curDir="/";
         File dir=new File(curDir);
@@ -87,6 +90,8 @@ public class navDir {
                 dir = new File(curDir);
             }
         }
+        if (wthSaf && rmvPath!=null && curDir.startsWith(rmvPath)) writeable=false;
+        else writeable=dir.canWrite();
         ArrayList <String> directories=new ArrayList<String>();
         ArrayList <String> files=new ArrayList<String>();
         directories.add("../   (up)");

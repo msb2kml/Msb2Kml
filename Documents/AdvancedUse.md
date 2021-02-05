@@ -1,7 +1,7 @@
 # Advanced use: derived values
 
-Advanced use is introduced when the file AddrSens.txt contains
-computations. An example is in the same directory as this text.
+Advanced use is introduced when the file **AddrSens.txt** contains
+formulas. An example is in the same directory as this text.
 
 Purpose: to compute for each sample some secondary data
 derived from the raw sensor data.
@@ -9,17 +9,18 @@ derived from the raw sensor data.
 ### Principle
 
 A "tool box" of functions is available for this. Each function
-is identified by a name starting with an equal "=", takes
+is identified by a name starting with an equal **"=**", takes
 some parameter(s) and acts on some variable(s).
 The first field of a line in AddrSens.txt starts with the name
 of the function followed by each parameter and variable
-separated by commas ",". The variables are identified
+separated by commas "**,**". The variables are identified
 by the character they have received (3thd field) preceded by a
-dollar "$" character. A variable could be defined before or after
+dollar "**$**" character. A variable could be defined before or after
 its use in the file.
-If a variable is not defined any function that use it is discarded
+If a variable is not defined, any function using it is discarded
 and also recursively any function using a variable defined
-by this function.
+by this function.  
+If the name of the function is not recognized, the line is ignored.
 
 The computation is performed in the order or definition in the file.
 The raw data and the computed data are kept in a registry between
@@ -27,16 +28,17 @@ samples. If a variable is used before it is declared, the value
 that it has is thus the one for the previous sample: it is a
 memory function.
 
-The file AddrSens.txt is shared with the application Msb2And.
+The file AddrSens.txt is shared with the application
+[Msb2And](https://github.com/msb2kml/Msb2And).
 
 ### Special variables
 
 There is one variable name that does not need to be defined and is
-computed by the program if it is used: "\#". It is the accumulated
+computed by the application when it is used: "**\#**". It is the accumulated
 traveled distance (km) between points of the GPS track.
 
-The variable named "%" could be defined and it has a special
-signification for the program. This variable should be in the range
+The variable named "**%**" could be defined and it has a special
+signification. It should be in the range
 0.0 to 100.0.
 There is a relation between the value of this variable
 and a color: from BLUE (0%) through GREEN to RED (100%) in 12 levels.
@@ -212,14 +214,14 @@ See: [Chart](Gallery/MSB_0095_17_4_12.jpg)
 
 #### Remote GPS reconstruction
 
-    =GPS,$<,$/,$|;GPS
+    =GPS,$<,$/,$|;GPS;   G
     
 + $< is the azimuth from the pilot to the plane computed by
  the GPS module.
 + $/ is the distance 2D from the pilot to the plane (module GPS).
 + $| is the altitude measured by the GPS.
 
-This compute the real location (lat, long, alt) from the telemetry
+This computes the real location (lat, long, alt) from the telemetry
 data instead of direct data if the starting location is provided.
 See the file "RemoteGPS".
 The value that could be printed is only 0.0 or 1.0: 1 if there has
@@ -233,7 +235,7 @@ been no conversion error; otherwise 0.
  It is not used otherwise than to be assured that the reconstruction
  has been provided.
 
-This extract the altitude (height above sea level) from the current
+This extracts the altitude (height above sea level) from the current
 GPS location.
 
 ### Latitude
@@ -244,7 +246,7 @@ GPS location.
  It is not used otherwise than to be assured that the reconstruction
  has been provided.
 
-This extract the latitude from the current GPS location.  
+This extracts the latitude from the current GPS location.  
 
 ### Longitude
 
@@ -254,7 +256,7 @@ This extract the latitude from the current GPS location.
  It is not used otherwise than to be assured that the reconstruction
  has been provided.
 
-This extract the longitude from the current GPS location;  
+This extracts the longitude from the current GPS location;  
 
 ### Distance to a turn point
 
@@ -265,12 +267,13 @@ This extract the longitude from the current GPS location;
  It is not used otherwise than to be assured that the reconstruction
  has been provided.
 
-This compute the distance in meters (rounded) from the plane
+This computes the distance in meters (rounded) from the plane
 to the location of "Turnpoint1".  
 Of course, this function could be invoked for several locations.  
 The location of turn points could be entered in the file
 StartGPS.gpx: see the file "RemoteGPS" 
-This function is ignored if a start location is specified (reconstructed GPS track)
+This function is ignored if a start location is specified
+(reconstructed GPS track)
 and if the distance from "Turnpoint1" to this start
 location is greater than 10 Km.
 
@@ -282,7 +285,7 @@ location is greater than 10 Km.
 + The second parameter (-0.8) is added to the result.
 + $Z is the reading to process.
 
-This computation is performed: ( $Z * (param 1) ) + (param 2)  
+The computation that is performed: ( $Z * (param 1) ) + (param 2)  
 This could be used to revert the sign for a G-Sensor and introduce
 a compensation for the gravity.  
 It could also be used to convert from Centigrade to Fahrenheit.

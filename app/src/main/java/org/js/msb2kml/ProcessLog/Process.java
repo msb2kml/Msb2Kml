@@ -96,6 +96,7 @@ public class Process extends AppCompatActivity {
         select.putExtra("CurrentDir",Directory);
         select.putExtra("WithDir",false);
         select.putExtra("Mask","MSB_\\d{4}+\\.csv");
+        select.putExtra("Title","Read from ");
         startActivityForResult(select,getResources().getInteger(R.integer.SELECTOR));
     }
 

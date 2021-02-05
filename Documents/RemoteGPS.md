@@ -1,3 +1,5 @@
+# Remote GPS
+
 The Flight Logger records, beside the telemetry data, the location data
 (latitude, latitude and absolute altitude) that is put on the MSB bus
 by the GPS module when they are together on board the plane.
@@ -5,14 +7,14 @@ by the GPS module when they are together on board the plane.
 When the Flight Logger is used on the ground, connected to a
 Souffleur or to the COM port of a MPX HF module, the location
 data is not available.
-The Msb2Kml application is now able to reconstruct the location
+The Msb2Kml application is able to reconstruct the location
 data from the telemetry data.
 This is also true for the log files recorded by the sibling
 application Msb2And.
 The following explanations are relative to the reconstruction
 of the location data. 
 
-# Preparation of the GPS module
+## Preparation of the GPS module
 
 The Multiplex Launcher program should have been used to attribute
 a MSB address to three essentials measurements:
@@ -26,14 +28,13 @@ Together theses measurements gives the position of the plane in
 a cylindrical system of coordinates centered on the pilot (in reality
 the center is the place of the first valid fix by the GPS module).
 
-Theses measures could be used in a formula to convert them to a common
+Theses measures could be used in a formula to convert them to a geographic
 location if the location of the pilot is known.
 
-# Pilot location
+## Pilot location
 
-Each known pilot locations is referenced for the application by a name.
-Such a name is a label for a location stored in a file
-StartGPS.gpx in the MSBlog directory.
+A table of known pilot locations is maintained in a file **StartGPS.gpx**
+in the MSBlog directory. Each location is referenced by a name.  
 A named location could have been prepared before or it could be specified
 when processing the log file.
 
@@ -42,15 +43,16 @@ to prepare a location.
 
 There are three methods available to record such a location:
 
-+ use the GPS of the tablet or smartphone.
++ use the GPS accessory of the tablet or smartphone.
 + write the location known by another mean (GPS, map, ...).
 + copy the location from a previously processed flight with
  the logger on board.
  
-The file StartGPS.gpx could be opened by an application such as Msb2Map
-to check the locations on a map.
+The file StartGPS.gpx could be opened by an application such as
+[Vtrk](https://github.com/msb2kml/Vtrk) to check the locations on a map.  
+This application could also be used to add locations to this file.
   
-# Location with GPS of device
+### Location with GPS of device
 
 You could be asked to modify two settings:
 
@@ -63,17 +65,17 @@ accuracy.
 You should give a meaningful name to this location before accepting it.
 The default name is a combination of the date and hour.
 
-# Entering a location
+### Entering a location
 
 You are presented with a form to enter the latitude and longitude in
 decimal degrees, and the altitude in meters.
-And a meaningful and unique name. The default name is a combination
+Also, a meaningful and unique name. The default name is a combination
 of the date and hour.
 If the location you have is in degrees, minutes, seconds you could
 convert it with some utilities like
 [RapidTables](https://www.rapidtables.com/convert/number/degrees-minutes-seconds-to-degrees.html).
 
-# Copying a location
+### Copying a location
 
 You are first presented a list of the previous flight for which there
 exists a GPX file. You select one on the basis of the displayed comments.
@@ -81,11 +83,11 @@ exists a GPX file. You select one on the basis of the displayed comments.
 The more time the GPS module has had to follow the satellites and the better the
 accuracy of the fix. If it is assumed that the plane has returned exactly where
 its flight has begun, the last fix recorded could be of a better quality.
-Thus, you have the choice to use the first or the fix.
+Thus, you have the choice to use the first or the last fix.
 You should enter a unique and meaningful name but the default 
 name is a combination of the date and hour when the fix has been taken.
 
-# Processing
+## Processing
 
 There are two requirements for the reconstruction of the location data:
 
@@ -104,5 +106,5 @@ The reconstructed location data is processed exactly like the
 genuine thing.
 
 The reconstruction has the priority on the recorded location:
-omit to specify a starting location name to use the recorded data.
+you could omit to specify a starting location name to use the recorded data.
 This could be used for testing.

@@ -1,6 +1,7 @@
 # Installation
 The application should be compiled from the sources of this
-repository or downloaded from the "Releases" pages.  
+repository or downloaded from the
+["Releases"](https://github.com/msb2kml/Msb2Kml/releases) pages.  
 The application package (such as Msb2KmlXX.apk) should be transferred 
 to the storage of the device (such as Downloads).  
 Selecting it with a File Manager should offer the opportunity to install it.
@@ -12,8 +13,9 @@ they are all frees.
 To look at GPS track in GPX files and display them on an
 overlay of topographic maps:
 [Msb2Map](https://github.com/msb2kml/Msb2Map/) from the same author.
+Minimum version of Msb2Map: 1.60.
 
-See: [Screenshot](Gallery/Screenshot_2019-10-16-14-36-39.jpg)
+![Slope](Gallery/Slope.jpg)
 
 To look at GPS track in KML files: [Google Earth](https://play.google.com/store/apps/details?id=com.google.earth).
 

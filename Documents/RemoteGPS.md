@@ -1,6 +1,6 @@
 # Remote GPS
 
-The Flight Logger records, beside the telemetry data, the location data
+The Flight Recorder stores, beside the telemetry data, the location data
 (latitude, latitude and absolute altitude) that is put on the MSB bus
 by the GPS module when they are together on board the plane.
 
@@ -21,7 +21,7 @@ a MSB address to three essentials measurements:
 
 + Azimuth: angle (degree) from the North under which the pilot see the plane.
 + Distance 2D: distance (m) from the pilot to the projection of the plane
- on the ground.
+ on the ground (use the Expert Mode).
 + Height: height (m) relative to the pilot.
 
 Together theses measurements gives the position of the plane in

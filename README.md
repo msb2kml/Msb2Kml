@@ -1,4 +1,5 @@
 # Purpose
+
 This Android application process and transform the data recorded
 by the Multiplex [Flight Recorder](https://www.multiplex-rc.de/produkte/85420-flightrecorder).
 This module records on a micro SD card the data circulating
@@ -20,7 +21,8 @@ contain the data transmitted through the telemetry from the GPS module,
 not the absolute position but the position of the plane relative to the pilot.
 The Msb2Kml application is able to reconstruct the geographic coordinates of
 the flight track from this data if the location of the pilot is provided.
-Log files produced by the sibling application Msb2And could also
+Log files produced by the sibling application
+[Msb2And](https://github.com/msb2kml/Msb2And) could also
 be processed this way.
 
 Running on a tablet or smartphone, it produces files that could
@@ -47,7 +49,7 @@ Alternatively it could be obtained with the documentation from
 the ["Releases"](https://github.com/msb2kml/Msb2Kml/releases)
 pages from the repository.
 
-In each case the application package (such as Msb2Kml57.apk) should be
+In each case the application package (such as Msb2Kml58.apk) should be
 transferred to the storage of the device (such as Downloads).
 Selecting it with a File Manager should offer the opportunity
 to install it.
@@ -67,7 +69,7 @@ To edit the configuration file: [DroidEdit](https://play.google.com/store/apps/d
 
 Vario, smoothed vario and height:
 
-![MSB_069](Documents/Gallery/MSB_0069_0_4_10_3.jpg)
+![MSB\_069](Documents/Gallery/MSB_0069_0_4_10_3.jpg)
 
 Slope soaring:
 

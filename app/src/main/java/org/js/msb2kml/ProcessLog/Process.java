@@ -191,7 +191,7 @@ public class Process extends AppCompatActivity {
         if (m.extract(context,MsbName)){
             Toast toast = Toast.makeText(this, "Using meta data file", Toast.LENGTH_LONG);
             toast.show();
-        }
+        } else m.fetchPref(context);
         startTime=m.getStartTime();
         DatePickerDialog dp=new DatePickerDialog(this,0,
 //                android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen,

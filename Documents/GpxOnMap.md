@@ -1,4 +1,5 @@
 # GPX track on map module
+
 This module draws the track from the GPX file on a map.  
 It works with interaction with the
 [Msb2Map](https://github.com/msb2kml/Msb2Map) application.
@@ -6,6 +7,7 @@ It works with interaction with the
 See the [menu](Gallery/MenuVtrk.jpg).
   
 ## Color
+
 The color of each segment of the track could be modulated by the
 corresponding value of one of the columns in the CSV file.  
 The color could vary from blue, through green, to red in 12 steps.
@@ -19,6 +21,7 @@ A segment is black if there is no valid value for the selected
 column in the CVS file.
 
 ## Mode "Entire"
+
 The whole track, from the beginning to the end, is drawn on
 the map by the Msb2Map application.
 
@@ -32,6 +35,7 @@ A small black dot marker is displayed at the start location of the flight.
 ![screenshot](Gallery/FullTrack.jpg)
 
 ### Mode "Vapor trail"
+
 See the explanations for the Msb2Map application.
 
 The track is drawn progressively, location by location, on the map.
@@ -44,6 +48,10 @@ the track: 2 minutes or 10 minutes.
 The drawing could be interrupted while the map is displayed,
 to modify the color setup or the speed, to skip some part and then
 to continue from the point of suspension.
+
+If the "**Orienting**" field has been checked on the main menu,
+the map is rotated to keep heading of the track to the top
+of the screen.
 
 Using the "Entire" mode reset the position at the beginning of the track.
 
@@ -65,10 +73,12 @@ magenta color. Locations are displayed as half-magenta diabolos.
 
 ![Landing](Gallery/Landing.jpg)
 
-## Orientation
+## Screen rotation
 
 This module and the Msb2Map application are not reacting to a change
-of orientation of the screen.
+of orientation of the screen.  
+However, it is possible to rotate the map with an action of the finger
+(unless the auto orientation has been selected for the Vapor trail mode).
 
 
 

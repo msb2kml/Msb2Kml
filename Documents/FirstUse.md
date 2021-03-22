@@ -1,10 +1,13 @@
 # First use
+
 ### Permissions
+
 On the most recent versions of Android, the permission to read and write
 files is requested at the first use. The permission to obtain the
 position from the GPS sensor is also needed for the "RemoteGPS" feature.
 
 ### Source directory
+
 It is possible to process log files directly from the SD card
 removed from the Flight Logger and mounted on the tablet or a
 USB card reader.
@@ -24,6 +27,7 @@ The application switch from one to the other when going "up" from
 the root.
 
 ### Output directory
+
 All the files produced by the application are placed in
 the directory MSBlog. It is created if
 not already existing. This directory is located
@@ -62,6 +66,7 @@ produce the files:
        of colored segments.
 
 ### Launching the application
+
 It has a red and green icon with the letters "M/K".
 There are two panels on the screen, the bottom one is
 concerned by the processing from a remote GPS module:
@@ -72,6 +77,7 @@ It works with a succession of menus with the possibility to get
 back to the upper level.
 
 ### Processing a new log
+
 As seen before, the file to process is selected with a specialized
 file explorer.
 
@@ -84,6 +90,7 @@ A progression bar is displayed while the log file is processed.
 Then the same visualization choices are presented as explained further.
 
 ### Progressive setup
+
 Some sensors put their data on the MSB bus with a
 delay after having been powered up.  
 This could result in output files with a variable number
@@ -93,6 +100,7 @@ the application discards all previous data at the appearance
 of a new sensor.
 
 ### Basic use of AddrSens.txt
+
 This file in the directory MSBlog provides some customization.  
 All lines of this file starting with a star "\*" are comments that
 are skipped.  
@@ -114,6 +122,7 @@ by ignored white spaces: this provides a better readability.
 
 
 ### Browsing processed logs
+
 The application look in the directory MSBlog for all files with
 a name of the form "MSB\_XXXX.txt" (meta files). 
 For each file are displayed: the date of the flight, the name of

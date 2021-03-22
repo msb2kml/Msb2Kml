@@ -148,6 +148,14 @@
         app:layout_constraintTop_toBottomOf="@id/cEntr"
         android:background="@drawable/box">
 
+        <CheckBox
+            android:id="@+id/upCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Orienting"
+            app:layout_constraintStart_toStartOf="@id/cTrail"
+            app:layout_constraintTop_toTopOf="@id/cTrail" />
+
         <RadioGroup
             android:id="@+id/speed"
             android:layout_width="wrap_content"

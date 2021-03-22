@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -55,6 +56,7 @@ public class Vtrk extends AppCompatActivity {
     TextView tTime;
     ProgressBar pBar;
     Button bEntire;
+    CheckBox ckUp;
     RadioGroup rSpeed;
     RadioButton sp1;
     RadioButton sp2;
@@ -86,6 +88,8 @@ public class Vtrk extends AppCompatActivity {
     String refDirectory =null;
     Intent intentMap=null;
     Double zoom=17.0;
+    Boolean rotMap=false;
+    Location arrowOrg=null;
     Long size;
     boolean running=false;
     Long lastTrk=null;
@@ -181,6 +185,7 @@ public class Vtrk extends AppCompatActivity {
         tTime=(TextView) findViewById(R.id.timeTrack_vt);
         pBar=(ProgressBar) findViewById(R.id.progress_vt);
         bEntire=(Button) findViewById(R.id.entire);
+        ckUp=(CheckBox) findViewById(R.id.upCheck);
         bSkp0=(Button) findViewById(R.id.skp0);
         bSkp2=(Button) findViewById(R.id.skp2);
         bSkp10=(Button) findViewById(R.id.skp10);
@@ -421,6 +426,7 @@ public class Vtrk extends AppCompatActivity {
 
     public void getSpeed(){
         int id=rSpeed.getCheckedRadioButtonId();
+        rotMap=ckUp.isChecked();
         switch (id){
             case R.id.sp1:
                 divisor=1l;
@@ -552,8 +558,8 @@ public class Vtrk extends AppCompatActivity {
     };
 
     void ckVcMap(int vc){
-        if (vc<16){
-            Toast.makeText(context,"Msb2Map revision should be at least 1.6",
+        if (vc<17){
+            Toast.makeText(context,"Msb2Map revision should be at least 1.7",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -823,6 +829,7 @@ public class Vtrk extends AppCompatActivity {
                 minVal=null;
                 maxVal=null;
                 curEntity=entity;
+                arrowOrg=null;
                 dispLoc=readTrk();
                 return false;
             default:
@@ -845,8 +852,9 @@ public class Vtrk extends AppCompatActivity {
                     minVal = Math.min(minVal, val.doubleValue());
                     maxVal = Math.max(maxVal, val.doubleValue());
                 }
-                bubble=String.format(Locale.ENGLISH,"%s %.1f to %.1f",
-                                    colHead.get(srcCol+1),minVal,maxVal);
+                bubble=String.format(Locale.ENGLISH,"%s %.1f",colHead.get(srcCol+1),val);
+//                bubble=String.format(Locale.ENGLISH,"%s %.1f to %.1f",
+//                                    colHead.get(srcCol+1),minVal,maxVal);
             }
         } else {
             Double alt=dispLoc.getAltitude();
@@ -862,8 +870,9 @@ public class Vtrk extends AppCompatActivity {
                 minVal=Math.min(minVal,alt);
                 maxVal=Math.max(maxVal,alt);
             }
-            bubble=String.format(Locale.ENGLISH,"Alt. %.1f to %.1f",
-                                    minVal,maxVal);
+            bubble=String.format(Locale.ENGLISH,"Alt. %.1f",alt);
+//            bubble=String.format(Locale.ENGLISH,"Alt. %.1f to %.1f",
+//                                    minVal,maxVal);
         }
         dispTrk(dispLoc,bubble,color,setStart,true);
         if (setStart){
@@ -909,7 +918,18 @@ public class Vtrk extends AppCompatActivity {
         nt.putExtra("LOC",loc);
         nt.putExtra("COLOR",color);
         nt.putExtra("BUBBLE",bubbleMap);
+        if (actTail && rotMap){
+            if (arrowOrg!=null){
+                float dist=arrowOrg.distanceTo(loc);
+                if (dist>10.0){
+                    float bearing=-arrowOrg.bearingTo(loc);
+                    nt.putExtra("ORIENT",bearing);
+                    arrowOrg=loc;
+                }
+            } else arrowOrg=loc;
+        }
         if (startLine){
+            nt.putExtra("ORIENT",0.0f);
             nt.putExtra("START",startLine);
             nt.putExtra("Tail",actTail);
         }
